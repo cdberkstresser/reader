@@ -1,10 +1,10 @@
 {
 
-  "description": "Adds a solid red border to all webpages matching mozilla.org. See https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Examples#borderify",
+  "description": "Adds a reader to work with campusweb",
   "manifest_version": 2,
-  "name": "Borderify",
-  "version": "1.0",
-  "homepage_url": "https://github.com/mdn/webextensions-examples/tree/master/borderify",
+  "name": "CampusWeb Reader",
+  "version": "0.1",
+  "homepage_url": "https://github.com/cdberkstresser/reader",
   "icons": {
     "48": "icons/border-48.png"
   },
@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": ["*://campusweb.cofo.edu/ICS/Academics/*screen=TakeTestView*"],
-      "js": ["borderify.js"]
+      "js": ["reader.js"]
     }
   ]
 
