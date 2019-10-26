@@ -38,7 +38,11 @@ for (question = 0; question < questions.length; ++question) {
 	}
 	//append the answer to the question so it can be read together.
 	questionText += answerText;
+	//sanitize some inputs
 	questionText = questionText.replace(/`/g, "");
+	questionText = questionText.replace(/'/g, "");
+	questionText = questionText.replace(/"/g, "");
+	questionText = questionText.replace(/[_]+/g, "");
 
 	//log all questions to the console
 	console.log(questionText);
