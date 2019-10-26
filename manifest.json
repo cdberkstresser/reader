@@ -3,7 +3,7 @@
   "description": "Adds a reader to work with campusweb",
   "manifest_version": 2,
   "name": "CampusWeb Reader",
-  "version": "0.35",
+  "version": "0.4",
   "homepage_url": "https://github.com/cdberkstresser/reader",
   "icons": {
     "48": "icons/reader-48.png"
