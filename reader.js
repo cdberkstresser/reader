@@ -7,7 +7,7 @@
 
 // get a list of questions to remove the screen reader offensive material.
 var questions = document.getElementsByClassName("questionDisplay");
-for (question = 0; question < questions.length; ++question) {
+for (var question = 0; question < questions.length; ++question) {
 	try {
 		/***************************************************************
 		* Step 1: Clean up the question and potential answers for speech synthesis.
@@ -18,14 +18,14 @@ for (question = 0; question < questions.length; ++question) {
 		// save answers for speech synthesis
 		var answerText = "";
 		var answers = questions[question].getElementsByClassName("multiChoice");
-		for (n = 0; n < answers.length; ++n) {
+		for (var n = 0; n < answers.length; ++n) {
 			answerText += "\n" + (n + 1) + " " + answers[n].getElementsByClassName("multiContent")[0].textContent.trim();
 		}
 
 		// append the answer to the question so it can be read together.
 		questionText += answerText + "\n";
 		// sanitize some inputs
-		questionText = questionText.replace(/[^a-zA-Z0-9/ /./,/?/:\n\r]/g,"");
+		questionText = questionText.replace(/[^a-zA-Z0-9/ /./,/?/:\n\r]/g, "");
 		// log all questions to the console
 		console.log(questionText);
 
@@ -42,11 +42,25 @@ for (question = 0; question < questions.length; ++question) {
 		questions[question].getElementsByClassName("pointDisplay")[0].textContent = questions[question].getElementsByClassName("pointDisplay")[0].textContent.replace(/\([0-9]+pts\)/g, "").trim() + "\n";
 
 		// remove the extra select blah as your answer headers.  These don't help.
-		questions[question].innerHTML = questions[question].innerHTML.replace(/Select (.*) as your answer/g, "")
+		var labels = questions[question].getElementsByTagName("label");
+		for (var n = 0; n < labels.length; ++n) {
+			labels[n].textContent = labels[n].textContent.replace(/Select (.*) as your answer/g, "");
+		}
 
 		//add a button to the question to play it in a speech synthesizer.
+		var btn = document.createElement("button");
+		btn.id = "btnPlay_" + question;
+		btn.name = btn.id;
+		btn.textContent = "Play";
+		btn.type = "button";
+		btn.style.marginRight = "1em";
+		btn.onclick = (function (msg) {
+			return function () { window.speechSynthesis.speak(new SpeechSynthesisUtterance(msg)); }
+		})(questionText);
 		var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
-		questionForInjectingButton.innerHTML = "<button type=button onclick='window.speechSynthesis.speak(new SpeechSynthesisUtterance(`" + questionText + "`));'>Play</button>&nbsp; " + questionForInjectingButton.innerHTML;
+		questionForInjectingButton.prepend(btn);
+
+
 	} catch (err) {
 		console.log("An error has occurred\n" + err);
 	}
