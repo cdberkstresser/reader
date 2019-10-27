@@ -25,7 +25,7 @@ for (question = 0; question < questions.length; ++question) {
 		// append the answer to the question so it can be read together.
 		questionText += answerText + "\n";
 		// sanitize some inputs
-		questionText = questionText.replace(/[^a-zA-Z0-9/ /./,/?/:/\n]/g,"");
+		questionText = questionText.replace(/[^a-zA-Z0-9/ /./,/?/:\n\r]/g,"");
 		// log all questions to the console
 		console.log(questionText);
 
@@ -46,8 +46,7 @@ for (question = 0; question < questions.length; ++question) {
 
 		//add a button to the question to play it in a speech synthesizer.
 		var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
-		questionForInjectingButton.textContent = questionForInjectingButton.textContent.trim();
-		questionForInjectingButton.innerHTML = "<button type=button onclick='window.speechSynthesis.speak(new SpeechSynthesisUtterance(`" + questionText + "`));'>Play</button>&nbsp; " + questionForInjectingButton.textContent;
+		questionForInjectingButton.innerHTML = "<button type=button onclick='window.speechSynthesis.speak(new SpeechSynthesisUtterance(`" + questionText + "`));'>Play</button>&nbsp; " + questionForInjectingButton.innerHTML;
 	} catch (err) {
 		console.log("An error has occurred\n" + err);
 	}
