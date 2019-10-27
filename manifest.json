@@ -3,7 +3,7 @@
   "description": "Adds a reader to work with campusweb",
   "manifest_version": 2,
   "name": "CampusWeb Reader",
-  "version": "0.5",
+  "version": "0.6",
   "homepage_url": "https://github.com/cdberkstresser/reader",
   "icons": {
     "16": "icons/reader-16.png",
@@ -16,7 +16,7 @@
 
   "content_scripts": [
     {
-      "matches": ["*://campusweb.cofo.edu/ICS/Academics/*screen=TakeTestView*"],
+      "matches": ["https://*.edu/ICS/Academics/*/Coursework.jnz*screen=TakeTestView*"],
       "js": ["reader.js"]
     }
   ]

@@ -1,6 +1,9 @@
-# reader
-**Adds a reader to work with campusweb for the cofo.edu domain.**
+# CampusWeb Reader
+**Adds an accessibility reader to exams and quizzes for higher learning organizations using the Jenzabar/CampusWeb LMS.**
 
 ## What it does
-This addon allows CampusWeb exam text to be pasted off of CampusWeb into screen readers for accessibility purposes. Currently, CampusWeb pollutes the copied text with extraneous text that makes it difficult to those with screen reader accessibility needs to utilize tts services.
-This addon also injects a "Read" button to allow CampusWeb questions (and potential answers) to be read via speech synthesis.
+This add-on changes two things on CampusWeb quizzes / exams:
+
+1. Allows CampusWeb exam text to be pasted off of CampusWeb into screen readers for accessibility purposes. 
+    * Currently, CampusWeb has extraneous text in the copied text that makes it difficult for those with screen-reader accessibility needs to utilize TTS services.
+2. Injects a "Read" button in each question to allow CampusWeb questions and their potential answers to be read via speech synthesis.
