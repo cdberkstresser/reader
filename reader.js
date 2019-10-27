@@ -25,17 +25,7 @@ for (question = 0; question < questions.length; ++question) {
 		// append the answer to the question so it can be read together.
 		questionText += answerText + "\n";
 		// sanitize some inputs
-		questionText = questionText.replace(/`/g, "");
-		questionText = questionText.replace(/'/g, "");
-		questionText = questionText.replace(/"/g, "");
-		questionText = questionText.replace(/\{/g, "");
-		questionText = questionText.replace(/\}/g, "");
-		questionText = questionText.replace(/#/g, "");
-		questionText = questionText.replace(/\/\//g, "");
-		questionText = questionText.replace(/\*/g, "");
-		questionText = questionText.replace(/[_]+/g, "");
-		questionText = questionText.replace(/[_]+/g, "");
-
+		questionText = questionText.replace(/[^a-zA-Z0-9/ /./,/?/:/\n]/g,"");
 		// log all questions to the console
 		console.log(questionText);
 
@@ -48,14 +38,11 @@ for (question = 0; question < questions.length; ++question) {
 			legends[0].parentNode.removeChild(legends[0]);
 		}
 
-		// remove the extra select blah as your answer headers.  These don't help.
-		var labels = questions[question].getElementsByTagName("label");
-		while (labels.length > 0) {
-			labels[0].parentNode.removeChild(labels[0]);
-		}
-
 		//remove the points possible on the assignment.  These don't help
-		questions[question].getElementsByClassName("pointDisplay")[0].textContent = questions[question].getElementsByClassName("pointDisplay")[0].textContent.replace().replace(/\([0-9]+pts\)/g, "").trim();
+		questions[question].getElementsByClassName("pointDisplay")[0].textContent = questions[question].getElementsByClassName("pointDisplay")[0].textContent.replace(/\([0-9]+pts\)/g, "").trim() + "\n";
+
+		// remove the extra select blah as your answer headers.  These don't help.
+		questions[question].innerHTML = questions[question].innerHTML.replace(/Select (.*) as your answer/g, "")
 
 		//add a button to the question to play it in a speech synthesizer.
 		var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
