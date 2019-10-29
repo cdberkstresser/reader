@@ -21,11 +21,12 @@ for (var question = 0; question < questions.length; ++question) {
 		for (var n = 0; n < answers.length; ++n) {
 			answerText += "\n" + (n + 1) + " " + answers[n].getElementsByClassName("multiContent")[0].textContent.trim();
 		}
-
+		
+		// replace _____ in questions with "[blank]" instead.
+		questionText = questionText.replace(/[_]{2,}/g,"[blank]");
+		
 		// append the answer to the question so it can be read together.
 		questionText += answerText + "\n";
-		// sanitize some inputs
-		questionText = questionText.replace(/[^a-zA-Z0-9/ /./,/?/:\n\r]/g, "");
 		// log all questions to the console
 		console.log(questionText);
 
@@ -54,9 +55,12 @@ for (var question = 0; question < questions.length; ++question) {
 		btn.textContent = "Play";
 		btn.type = "button";
 		btn.style.marginRight = "1em";
-		btn.onclick = (function (msg) {
-			return function () { window.speechSynthesis.speak(new SpeechSynthesisUtterance(msg)); }
-		})(questionText);
+		btn.onclick = (function (id, msg) {
+			return function () {
+				window.speechSynthesis.cancel();
+				window.speechSynthesis.speak(new SpeechSynthesisUtterance(msg)); 
+			}
+		})(btn.id, questionText);
 		var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
 		questionForInjectingButton.prepend(btn);
 
