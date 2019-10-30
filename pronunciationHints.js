@@ -5,7 +5,9 @@
  * @param msg The message in which to change text to be more pronounce-able.
  */
 function pronunciationHint(msg) {
-    msg = msg.replace(/\bprintln\b/gi, "printLine");
+	try {
+    msg = msg.replace(/\bprintln\b/gi, "print line");
+	msg = msg.replace(/\btoString\b/g, "two string");
     msg = msg.replace(/\bdeque\b/gi, "deck");
     msg = msg.replace(/\bdequeue\b/gi, "dee-queue");
     msg = msg.replace(/\benqueue\b/gi, "in-queue");
@@ -20,6 +22,9 @@ function pronunciationHint(msg) {
     msg = msg.replace(/O\(n\^5\)/gi, "O of n to the fifth");
     msg = msg.replace(/O\(n\!\)/gi, "O of n factorial");
     msg = msg.replace(/O\(n\^n\)/gi, "O of n to the power of n");
-
-    return msg;
+	} catch (err) {
+		
+	} finally {
+		return msg;
+	}
 }
