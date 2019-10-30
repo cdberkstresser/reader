@@ -21,10 +21,10 @@ for (var question = 0; question < questions.length; ++question) {
 		for (var n = 0; n < answers.length; ++n) {
 			answerText += "\n" + (n + 1) + " " + answers[n].getElementsByClassName("multiContent")[0].textContent.trim();
 		}
-		
+
 		// replace _____ in questions with "[blank]" instead.
-		questionText = questionText.replace(/[_]{2,}/g,"[blank]");
-		
+		questionText = questionText.replace(/[_]{2,}/g, "[blank]");
+
 		// append the answer to the question so it can be read together.
 		questionText += answerText + "\n";
 		// log all questions to the console
@@ -57,8 +57,18 @@ for (var question = 0; question < questions.length; ++question) {
 		btn.style.marginRight = "1em";
 		btn.onclick = (function (id, msg) {
 			return function () {
-				window.speechSynthesis.cancel();
-				window.speechSynthesis.speak(new SpeechSynthesisUtterance(msg)); 
+
+				if (document.getElementById(id).textContent == "Stop") { 	// if something is already playing, just cancel it.
+					window.speechSynthesis.cancel();
+				} else {
+					document.getElementById(id).textContent = "Stop"; 		// otherwise, start playing and set the button to allow stoppage
+					window.speechSynthesis.cancel();
+					var questionUtterance = new SpeechSynthesisUtterance(msg);
+					window.speechSynthesis.speak(questionUtterance);
+					questionUtterance.onend = function () {					// add an event to reset the text to "Play"
+						document.getElementById(id).textContent = "Play";
+					}
+				}
 			}
 		})(btn.id, questionText);
 		var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
