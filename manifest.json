@@ -1,5 +1,4 @@
 {
-
   "description": "Adds a reader to work with campusweb",
   "manifest_version": 2,
   "name": "CampusWeb Reader",
@@ -13,12 +12,15 @@
     "96": "icons/reader-96.png",
     "128": "icons/reader-128.png"
   },
-
   "content_scripts": [
     {
-      "matches": ["https://*.edu/ICS/Academics/*/Coursework.jnz*screen=TakeTestView*"],
-      "js": ["reader.js"]
+      "matches": [
+        "https://*.edu/ICS/Academics/*/Coursework.jnz*screen=TakeTestView*"
+      ],
+      "js": [
+        "reader.js",
+        "pronunciationHints.js"
+      ]
     }
   ]
-
 }

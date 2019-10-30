@@ -63,7 +63,7 @@ for (var question = 0; question < questions.length; ++question) {
 				} else {
 					document.getElementById(id).textContent = "Stop"; 		// otherwise, start playing and set the button to allow stoppage
 					window.speechSynthesis.cancel();
-					var questionUtterance = new SpeechSynthesisUtterance(msg);
+					var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
 					window.speechSynthesis.speak(questionUtterance);
 					questionUtterance.onend = function () {					// add an event to reset the text to "Play"
 						document.getElementById(id).textContent = "Play";
