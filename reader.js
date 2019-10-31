@@ -5,53 +5,8 @@
  * CampusWeb pukes up a lot hidden text that makes screen readers difficult to use.
  */
 
-/**
- * Options menu for the top of the quiz.
- */
-try {
-	var settingsDiv = document.createElement("div");
-	var voiceSelect = document.createElement("select");
-	var speedSelect = document.createElement("select");
-	var pitchSelect = document.createElement("select");
-	//first the container div
-	settingsDiv.id = "divReaderSettings";
-	settingsDiv.textContent = "Reader Settings:\n";
-	settingsDiv.setAttribute('style', 'white-space: pre;');
-	settingsDiv.style.marginBottom = "1em";
-	settingsDiv.style.fontWeight = "bold";
-
-	//the voices
-	voiceSelect.name = "readerVoice";
-	voiceSelect.id = "readerVoice";
-	voiceSelect.style.marginRight = "0.5em";
-	var voices = speechSynthesis.getVoices();
-	for (var n = 0; n < voices.length; ++n) {
-		voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
-	}
-
-	//the speeds
-	for (var n = 5; n <= 15; n++) {
-		speedSelect.options[speedSelect.options.length] = new Option("Speed: " + (n / 10) + "x", n / 10);
-	}
-	speedSelect.selectedIndex = 5;
-	speedSelect.style.marginRight = "0.5em";
-
-	//the pitch
-	for (var n = 0; n <= 20; n++) {
-		pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
-	}
-	pitchSelect.selectedIndex = 10;
-	pitchSelect.style.marginRight = "0.5em";
-
-	document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
-	settingsDiv.append(voiceSelect);
-	settingsDiv.append(speedSelect);
-	settingsDiv.append(pitchSelect);
-} catch (err) {
-
-}
-
 // get a list of questions to remove the screen reader offensive material.
+
 var questions = document.getElementsByClassName("questionDisplay");
 for (var question = 0; question < questions.length; ++question) {
 	try {
@@ -111,11 +66,13 @@ for (var question = 0; question < questions.length; ++question) {
 					window.speechSynthesis.cancel();
 					var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
 					try {
-						questionUtterance.voice = speechSynthesis.getVoices()[voiceSelect.options[voiceSelect.selectedIndex].value];
-						questionUtterance.rate = speedSelect.options[speedSelect.selectedIndex].value;
-						questionUtterance.pitch = pitchSelect.options[pitchSelect.selectedIndex].value;
+						var getting = browser.storage.sync.get("voice");
+						console.log(browser.storage.sync.get("voice").then());
+						questionUtterance.voice = speechSynthesis.getVoices()[browser.storage.sync.get("voice")];
+						//questionUtterance.rate = speedSelect.options[speedSelect.selectedIndex].value;
+						//questionUtterance.pitch = pitchSelect.options[pitchSelect.selectedIndex].value;
 					} catch (err) {
-
+						console.log(err);
 					}
 					window.speechSynthesis.speak(questionUtterance);
 					questionUtterance.onend = function () {					// add an event to reset the text to "Play"

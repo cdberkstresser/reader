@@ -1,32 +1,36 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
-        <meta charset="utf-8">
+	<meta charset="utf-8">
 	<title>Test Page</title>
 	<link rel="stylesheet" href="options.css">
-    <script>
-        function setOptions() {
-            var x = document.getElementById("languages");
-            var voices = speechSynthesis.getVoices();
-            for (var n = 0;n<voices.length;++n) {
-                x.options[x.options.length] = new Option(voices[n].name, n);
-            }
-        }
-        </script>
-        </head>
+</head>
+
 <body>
-	<form method=get>
+	<form>
 		<div id=settings>
 			<h1>CampusWeb Reader Options</h1>
-			<label for=languages>
-				Select Language Reader: 
+			<label for=voice>
+				Voice:
 			</label>
-			<select id=languages name=optLanguages>
+			<select id="voice">
 			</select>
-		<input type=submit value=Set name=btnSubmit>
+			<label for="speed">
+				Speed:
+			</label>
+			<select id="speed">
+			</select>
+			<label for="pitch">
+				Pitch:
+			</label>
+			<select id="pitch">
+			</select>
+			<button type="submit">Set</button>
 		</div>
 	</form>
-	 <script src="options.js"></script>
+	<script src="options.js"></script>
 </body>
+
 </html>
