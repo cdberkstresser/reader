@@ -1,0 +1,32 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+        <meta charset="utf-8">
+	<title>Test Page</title>
+	<link rel="stylesheet" href="options.css">
+    <script>
+        function setOptions() {
+            var x = document.getElementById("languages");
+            var voices = speechSynthesis.getVoices();
+            for (var n = 0;n<voices.length;++n) {
+                x.options[x.options.length] = new Option(voices[n].name, n);
+            }
+        }
+        window.addEventListener('load',setOptions);
+        </script>
+        </head>
+<body>
+	<form method=get>
+		<div id=settings>
+			<h1>CampusWeb Reader Options</h1>
+			<label for=languages>
+				Select Language Reader: 
+			</label>
+			<select id=languages name=optLanguages>
+			</select>
+		<input type=submit value=Set name=btnSubmit>
+		</div>
+	</form>
+</body>
+</html>
