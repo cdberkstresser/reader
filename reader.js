@@ -5,9 +5,44 @@
  * CampusWeb pukes up a lot hidden text that makes screen readers difficult to use.
  */
 
-// get a list of questions to remove the screen reader offensive material.
+/**
+ * Set up placeholders for easy access to voice, pitch, and speed settings and restore from storage.
+ */
+var settingsVoice = document.createElement("input");
+var settingsPitch = document.createElement("input");
+var settingsSpeed = document.createElement("input");
+
+settingsVoice.id = "settingsVoice";
+settingsVoice.setAttribute("type", "hidden");
+settingsSpeed.id = "settingsSpeed";
+settingsSpeed.setAttribute("type", "hidden");
+settingsPitch.id = "settingsPitch";
+settingsPitch.setAttribute("type", "hidden");
+
 
 var questions = document.getElementsByClassName("questionDisplay");
+questions[0].prepend(settingsVoice);
+questions[0].prepend(settingsSpeed);
+questions[0].prepend(settingsPitch);
+
+try {
+	var gettingVoice = browser.storage.sync.get('voice');
+	gettingVoice.then((res) => {
+		document.getElementById("settingsVoice").value = res.voice;
+	});
+	var gettingSpeed = browser.storage.sync.get('speed');
+	gettingSpeed.then((res) => {
+		document.getElementById("settingsSpeed").value = res.speed;
+	});
+	var gettingPitch = browser.storage.sync.get('pitch');
+	gettingPitch.then((res) => {
+		document.getElementById("settingsPitch").value = res.pitch;
+	});
+} catch (err) {
+	console.log(err);
+}
+
+// get a list of questions to remove the screen reader offensive material.
 for (var question = 0; question < questions.length; ++question) {
 	try {
 		/***************************************************************
@@ -58,19 +93,17 @@ for (var question = 0; question < questions.length; ++question) {
 		btn.style.marginRight = "1em";
 		btn.onclick = (function (id, msg) {
 			return function () {
-
 				if (document.getElementById(id).textContent == "Stop") { 	// if something is already playing, just cancel it.
 					window.speechSynthesis.cancel();
 				} else {
 					document.getElementById(id).textContent = "Stop"; 		// otherwise, start playing and set the button to allow stoppage
 					window.speechSynthesis.cancel();
-					var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
+					questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
 					try {
-						var getting = browser.storage.sync.get("voice");
-						console.log(browser.storage.sync.get("voice").then());
-						questionUtterance.voice = speechSynthesis.getVoices()[browser.storage.sync.get("voice")];
-						//questionUtterance.rate = speedSelect.options[speedSelect.selectedIndex].value;
-						//questionUtterance.pitch = pitchSelect.options[pitchSelect.selectedIndex].value;
+						var voiceNumber = document.getElementById("settingsVoice").value;
+						questionUtterance.voice = speechSynthesis.getVoices()[voiceNumber];
+						questionUtterance.rate = document.getElementById("settingsSpeed").value;
+						questionUtterance.pitch = document.getElementById("settingsPitch").value;
 					} catch (err) {
 						console.log(err);
 					}

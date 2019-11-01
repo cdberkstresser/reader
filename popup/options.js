@@ -1,26 +1,35 @@
 function saveOptions(e) {
-    e.preventDefault();
     browser.storage.sync.set({
-        voice: 0
+        voice: document.querySelector("#voice").value,
+        speed: document.querySelector("#speed").value,
+        pitch: document.querySelector("#pitch").value
     });
+    e.preventDefault();
 }
 
 function restoreOptions() {
+    var storageVoice = browser.storage.managed.get('voice');
+    var storageSpeed = browser.storage.managed.get('speed');
+    var storagePitch = browser.storage.managed.get('pitch');
 
-    function setCurrentChoice(result) {
-        document.querySelector("#voice").value = result.voice || "0";
-    }
+    var gettingVoice = browser.storage.sync.get('voice');
+    gettingVoice.then((res) => {
+        document.querySelector("#voice").value = res.voice || 0;
+    });
 
-    function onError(error) {
-        console.log(`Error: ${error}`);
-    }
-
-    var getting = browser.storage.sync.get("voice");
-    getting.then(setCurrentChoice, onError);
+    var gettingSpeed = browser.storage.sync.get('speed');
+    gettingSpeed.then((res) => {
+        document.querySelector("#speed").value = res.speed || 1;
+    });
+    var gettingPitch = browser.storage.sync.get('pitch');
+    gettingPitch.then((res) => {
+        document.querySelector("#pitch").value = res.pitch || 1;
+    });
 }
 
-document.addEventListener("DOMContentLoaded", restoreOptions);
-document.querySelector("form").addEventListener("submit", saveOptions);
+document.addEventListener('DOMContentLoaded', restoreOptions);
+document.querySelector("form").addEventListener("change", saveOptions);
+
 
 /**
  * Options menu for the top of the quiz.

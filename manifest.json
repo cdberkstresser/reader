@@ -13,6 +13,10 @@
     "96": "icons/reader-96.png",
     "128": "icons/reader-128.png"
   },
+  "browser_action": {
+    "default_icon": "icons/reader-128.png",
+    "default_title": "CampusWeb Reader"
+  },
   "options_ui": {
     "page": "popup/options.html"
   },
