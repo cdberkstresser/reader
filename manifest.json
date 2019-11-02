@@ -12,6 +12,7 @@
     "96": "icons/reader-96.png",
     "128": "icons/reader-128.png"
   },
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": [

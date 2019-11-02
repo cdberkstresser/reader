@@ -21,18 +21,20 @@ try {
 	settingsDiv.style.fontWeight = "bold";
 
 	//the voices
-	voiceSelect.name = "readerVoice";
-	voiceSelect.id = "readerVoice";
+	voiceSelect.name = "voice";
+	voiceSelect.id = "voice";
 	voiceSelect.style.marginRight = "0.5em";
 	var voices = speechSynthesis.getVoices();
 	for (var n = 0; n < voices.length; ++n) {
 		voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
 	}
-	if (voiceSelect.options.length ==0) {
+	if (voiceSelect.options.length == 0) {
 		voiceSelect.style.display = "none";
 	}
 
 	//the speeds
+	speedSelect.name = "speed";
+	speedSelect.id = "speed";
 	for (var n = 5; n <= 15; n++) {
 		speedSelect.options[speedSelect.options.length] = new Option("Speed: " + (n / 10) + "x", n / 10);
 	}
@@ -40,6 +42,8 @@ try {
 	speedSelect.style.marginRight = "0.5em";
 
 	//the pitch
+	pitchSelect.name = "pitch";
+	pitchSelect.id = "pitch";
 	for (var n = 1; n <= 20; n++) {
 		pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
 	}
@@ -51,7 +55,7 @@ try {
 	settingsDiv.append(speedSelect);
 	settingsDiv.append(pitchSelect);
 } catch (err) {
-
+	console.log(err);
 }
 
 // get a list of questions to remove the screen reader offensive material.
@@ -138,4 +142,42 @@ for (var question = 0; question < questions.length; ++question) {
 	}
 }
 //set a blue border to let users know this extension is active.
+restoreOptions();
+document.getElementById("voice").addEventListener("change", saveOptions);
+document.getElementById("speed").addEventListener("change", saveOptions);
+document.getElementById("pitch").addEventListener("change", saveOptions);
 document.body.style.border = "5px solid blue";
+
+/**
+ * This method saves the user's chosen properties of the voice to local storage.  Did not use sync storage since different machines and OSs may have different voices.
+ * @param {*} e The event arguments
+ */
+function saveOptions(e) {
+	try {
+		var api = chrome || browser;
+		api.storage.local.set({
+			voice: document.querySelector("#voice").value,
+			speed: document.querySelector("#speed").value,
+			pitch: document.querySelector("#pitch").value
+		});
+		e.preventDefault();
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+/**
+ * Restores voice options from local storage.
+ */
+function restoreOptions() {
+	try {
+		var api = chrome || browser;
+		api.storage.local.get(null, res => {
+			document.querySelector("#voice").value = res.voice || 0;
+			document.querySelector("#speed").value = res.speed || 1;
+			document.querySelector("#pitch").value = res.pitch || 1;
+		});
+	} catch (err) {
+		console.log(err);
+	}
+}
