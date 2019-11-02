@@ -28,6 +28,9 @@ try {
 	for (var n = 0; n < voices.length; ++n) {
 		voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
 	}
+	if (voiceSelect.options.length ==0) {
+		voiceSelect.style.display = "none";
+	}
 
 	//the speeds
 	for (var n = 5; n <= 15; n++) {
@@ -37,10 +40,10 @@ try {
 	speedSelect.style.marginRight = "0.5em";
 
 	//the pitch
-	for (var n = 0; n <= 20; n++) {
+	for (var n = 1; n <= 20; n++) {
 		pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
 	}
-	pitchSelect.selectedIndex = 10;
+	pitchSelect.selectedIndex = 9;
 	pitchSelect.style.marginRight = "0.5em";
 
 	document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
@@ -111,7 +114,9 @@ for (var question = 0; question < questions.length; ++question) {
 					window.speechSynthesis.cancel();
 					var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
 					try {
-						questionUtterance.voice = speechSynthesis.getVoices()[voiceSelect.options[voiceSelect.selectedIndex].value];
+						if (voiceSelect.options.length > 0) {
+							questionUtterance.voice = speechSynthesis.getVoices()[voiceSelect.options[voiceSelect.selectedIndex].value];
+						}
 						questionUtterance.rate = speedSelect.options[speedSelect.selectedIndex].value;
 						questionUtterance.pitch = pitchSelect.options[pitchSelect.selectedIndex].value;
 					} catch (err) {
