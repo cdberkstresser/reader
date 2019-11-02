@@ -19,36 +19,38 @@ try {
 	settingsDiv.setAttribute('style', 'white-space: pre;');
 	settingsDiv.style.marginBottom = "1em";
 	settingsDiv.style.fontWeight = "bold";
+	settingsDiv.style.display = "inline-block";
+	settingsDiv.style.border = "1px solid";
+	settingsDiv.style.padding = "0.5em";
 
 	//the voices
 	voiceSelect.name = "voice";
 	voiceSelect.id = "voice";
-	voiceSelect.style.marginRight = "0.5em";
-	var voices = speechSynthesis.getVoices();
-	for (var n = 0; n < voices.length; ++n) {
-		voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
-	}
-	if (voiceSelect.options.length == 0) {
-		voiceSelect.style.display = "none";
-	}
+	voiceSelect.style.width = "100%";
+	voiceSelect.style.display = "block";
+	voiceSelect.style.marginBottom = "0.5em";
 
 	//the speeds
 	speedSelect.name = "speed";
 	speedSelect.id = "speed";
+	speedSelect.style.width = "100%";
+	speedSelect.style.display = "block";
 	for (var n = 5; n <= 15; n++) {
 		speedSelect.options[speedSelect.options.length] = new Option("Speed: " + (n / 10) + "x", n / 10);
 	}
 	speedSelect.selectedIndex = 5;
-	speedSelect.style.marginRight = "0.5em";
+	speedSelect.style.marginBottom = "0.5em";
 
 	//the pitch
 	pitchSelect.name = "pitch";
 	pitchSelect.id = "pitch";
+	pitchSelect.style.width = "100%";
+	pitchSelect.style.display = "block";
 	for (var n = 1; n <= 20; n++) {
 		pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
 	}
 	pitchSelect.selectedIndex = 9;
-	pitchSelect.style.marginRight = "0.5em";
+	//pitchSelect.style.marginRight = "0.5em";
 
 	document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
 	settingsDiv.append(voiceSelect);
@@ -142,10 +144,12 @@ for (var question = 0; question < questions.length; ++question) {
 	}
 }
 //set a blue border to let users know this extension is active.
+setUpVoices();
 restoreOptions();
 document.getElementById("voice").addEventListener("change", saveOptions);
 document.getElementById("speed").addEventListener("change", saveOptions);
 document.getElementById("pitch").addEventListener("change", saveOptions);
+window.speechSynthesis.addEventListener('voiceschanged', setUpVoices);
 document.body.style.border = "5px solid blue";
 
 /**
@@ -173,10 +177,54 @@ function restoreOptions() {
 	try {
 		var api = chrome || browser;
 		api.storage.local.get(null, res => {
-			document.querySelector("#voice").value = res.voice || 0;
+			document.querySelector("#voice").value = res.voice || getFirstVoice();
 			document.querySelector("#speed").value = res.speed || 1;
 			document.querySelector("#pitch").value = res.pitch || 1;
 		});
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+/**
+ * The speechSynthesis object isn't always ready at load.  Make it an event.
+ */
+function setUpVoices() {
+	try {
+		var voiceSelect = document.querySelector("#voice");
+		if (voiceSelect.options.length == 0) {
+			if (typeof window.speechSynthesis !== 'undefined') {
+				var voices = window.speechSynthesis.getVoices();
+				for (var n = 0; n < voices.length; ++n) {
+					if (voices[n].lang.substring(0, 2) == document.documentElement.lang.substring(0, 2)) {
+						voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
+					}
+				}
+				voiceSelect.style.display = "initial";
+			} else {
+				voiceSelect.style.display = "none";
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+/**
+ * Get the first voice available that matches the document language.
+ */
+function getFirstVoice() {
+	try {
+		var voiceSelect = document.querySelector("#voice");
+		if (typeof window.speechSynthesis !== 'undefined') {
+			var voices = window.speechSynthesis.getVoices();
+			for (var n = 0; n < voices.length; ++n) {
+				if (voices[n].lang.substring(0, 2) == document.documentElement.lang.substring(0, 2)) {
+					return n;
+				}
+			}
+		}
+		return 0;
 	} catch (err) {
 		console.log(err);
 	}
