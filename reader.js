@@ -233,17 +233,17 @@ function getFirstVoice() {
 }
 
 function ssml(msg) {
-	var text = `<!-- ?xml version="1.0"? -->
-	<speak xmlns="http://www.w3.org/2001/10/synthesis"
-		   xmlns:dc="http://purl.org/dc/elements/1.1/"
-		   version="1.1">
-		<s xml:lang="en-US">
-		  <voice name="David" gender="male" age="25">
-			For English, press <emphasis>one</emphasis>.
-		  </voice>
-		</s>
-	  </p>
-	
+	var text = `<?xml version="1.0"?>
+	<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"
+		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		   xsi:schemaLocation="http://www.w3.org/2001/10/synthesis
+					 http://www.w3.org/TR/speech-synthesis11/synthesis.xsd"
+		   xml:lang="en-US">
+		   <s>
+		   <voice name="Zira" gender="female" age="25">`
+		   + msg + 
+	`	   </voice>
+	      </s>
 	</speak>`;
 	return text;
 }
