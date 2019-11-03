@@ -12,22 +12,48 @@
 	<form>
 		<div id=settings>
 			<h1>CampusWeb Reader Options</h1>
-			(Will only affect newly opened pages)<br>
-			<label for=voice>
-				Voice:
-			</label>
-			<select id="voice">
-			</select>
-			<label for="speed">
-				Speed:
-			</label>
-			<select id="speed">
-			</select>
-			<label for="pitch">
-				Pitch:
-			</label>
-			<select id="pitch">
-			</select>
+			<span id=caveat>(Will only affect newly opened pages)</span><br>
+			<table>
+				<tr class=experimentalHeader>
+					<th colspan=3>
+						<label for=experimentalMode>Enable Experimental Mode</label><input id=experimentalMode
+							type="checkbox" value=0>
+					</th>
+				</tr>
+				<tr class=experimentalDetail>
+					<td>
+						&nbsp;
+					</td>
+					<td>
+						<label for=indefiniteArticleColor>Color indefinite articles:</label>
+					</td>
+					<td>
+						<input id=indefiniteArticleColor type="checkbox" value=1>
+					</td>
+				</tr>
+				<tr class=experimentalDetail>
+					<td>
+						&nbsp;
+					</td>
+					<td>
+						<label for=definiteArticleColor>Color definite articles:</label>
+					</td>
+					<td>
+						<input id=definiteArticleColor type="checkbox" value=1>
+					</td>
+				</tr>
+				<tr class=experimentalDetail>
+						<td>
+							&nbsp;
+						</td>
+						<td>
+							<label for=dyslexify>Attempt to simulate dyslexia for reading:</label>
+						</td>
+						<td>
+							<input id=dyslexify type="checkbox" value=1>
+						</td>
+					</tr>
+				</table>
 		</div>
 	</form>
 	<script src="options.js"></script>

@@ -11,3 +11,12 @@ select, button {
 	margin-bottom: 0.5em;
 	height: 2em;
 }
+#caveat {
+	display:block;
+	text-align:center;
+}
+table {
+	border:1px solid black;
+	margin-left:auto;
+	margin-right:auto;
+}
