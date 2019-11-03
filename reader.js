@@ -118,7 +118,9 @@ for (var question = 0; question < questions.length; ++question) {
 				} else {
 					document.getElementById(id).textContent = "Stop"; 		// otherwise, start playing and set the button to allow stoppage
 					window.speechSynthesis.cancel();
-					var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
+
+					//var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
+					var questionUtterance = new SpeechSynthesisUtterance(ssml(msg));
 					try {
 						if (voiceSelect.options.length > 0) {
 							questionUtterance.voice = speechSynthesis.getVoices()[voiceSelect.options[voiceSelect.selectedIndex].value];
@@ -228,4 +230,20 @@ function getFirstVoice() {
 	} catch (err) {
 		console.log(err);
 	}
+}
+
+function ssml(msg) {
+	var text = `<!-- ?xml version="1.0"? -->
+	<speak xmlns="http://www.w3.org/2001/10/synthesis"
+		   xmlns:dc="http://purl.org/dc/elements/1.1/"
+		   version="1.1">
+		<s xml:lang="en-US">
+		  <voice name="David" gender="male" age="25">
+			For English, press <emphasis>one</emphasis>.
+		  </voice>
+		</s>
+	  </p>
+	
+	</speak>`;
+	return text;
 }
