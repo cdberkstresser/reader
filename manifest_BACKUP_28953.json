@@ -1,8 +1,9 @@
+<<<<<<< HEAD
 {
   "description": "Adds a reader to work with campusweb",
   "manifest_version": 2,
   "name": "CampusWeb Reader",
-  "version": "1.1",
+  "version": "0.9",
   "homepage_url": "https://github.com/cdberkstresser/reader",
   "permissions": ["storage"],
   "icons": {
@@ -20,6 +21,37 @@
   "options_ui": {
     "page": "popup/options.html"
   },
+  "applications": {
+    "gecko": {
+      "id": "cdberkstresser@protonmail.com"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.edu/ICS/Academics/*/Coursework.jnz*screen=TakeTestView*"
+      ],
+      "js": [
+        "reader.js",
+        "pronunciationHints.js"
+      ]
+    }
+  ]
+=======
+{
+  "description": "Adds a reader to work with campusweb",
+  "manifest_version": 2,
+  "name": "CampusWeb Reader",
+  "version": "1.1",
+  "homepage_url": "https://github.com/cdberkstresser/reader",
+  "icons": {
+    "16": "icons/reader-16.png",
+    "32": "icons/reader-32.png",
+    "48": "icons/reader-48.png",
+    "64": "icons/reader-64.png",
+    "96": "icons/reader-96.png",
+    "128": "icons/reader-128.png"
+  },
   "permissions": ["storage"],
   "content_scripts": [
     {
@@ -32,4 +64,5 @@
       ]
     }
   ]
+>>>>>>> master
 }

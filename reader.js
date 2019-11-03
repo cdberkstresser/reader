@@ -6,43 +6,62 @@
  */
 
 /**
- * Set up placeholders for easy access to voice, pitch, and speed settings and restore from storage.
+ * Options menu for the top of the quiz.
  */
-var settingsVoice = document.createElement("input");
-var settingsPitch = document.createElement("input");
-var settingsSpeed = document.createElement("input");
-
-settingsVoice.id = "settingsVoice";
-settingsVoice.setAttribute("type", "hidden");
-settingsSpeed.id = "settingsSpeed";
-settingsSpeed.setAttribute("type", "hidden");
-settingsPitch.id = "settingsPitch";
-settingsPitch.setAttribute("type", "hidden");
-
-
-var questions = document.getElementsByClassName("questionDisplay");
-questions[0].prepend(settingsVoice);
-questions[0].prepend(settingsSpeed);
-questions[0].prepend(settingsPitch);
-
 try {
-	var gettingVoice = browser.storage.sync.get('voice');
-	gettingVoice.then((res) => {
-		document.getElementById("settingsVoice").value = res.voice;
-	});
-	var gettingSpeed = browser.storage.sync.get('speed');
-	gettingSpeed.then((res) => {
-		document.getElementById("settingsSpeed").value = res.speed;
-	});
-	var gettingPitch = browser.storage.sync.get('pitch');
-	gettingPitch.then((res) => {
-		document.getElementById("settingsPitch").value = res.pitch;
-	});
+	var settingsDiv = document.createElement("div");
+	var voiceSelect = document.createElement("select");
+	var speedSelect = document.createElement("select");
+	var pitchSelect = document.createElement("select");
+	//first the container div
+	settingsDiv.id = "divReaderSettings";
+	settingsDiv.textContent = "Reader Settings:\n";
+	settingsDiv.setAttribute('style', 'white-space: pre;');
+	settingsDiv.style.marginBottom = "1em";
+	settingsDiv.style.fontWeight = "bold";
+	settingsDiv.style.display = "inline-block";
+	settingsDiv.style.border = "1px solid";
+	settingsDiv.style.padding = "0.5em";
+
+	//the voices
+	voiceSelect.name = "voice";
+	voiceSelect.id = "voice";
+	voiceSelect.style.width = "100%";
+	voiceSelect.style.display = "block";
+	voiceSelect.style.marginBottom = "0.5em";
+
+	//the speeds
+	speedSelect.name = "speed";
+	speedSelect.id = "speed";
+	speedSelect.style.width = "100%";
+	speedSelect.style.display = "block";
+	for (var n = 5; n <= 15; n++) {
+		speedSelect.options[speedSelect.options.length] = new Option("Speed: " + (n / 10) + "x", n / 10);
+	}
+	speedSelect.selectedIndex = 5;
+	speedSelect.style.marginBottom = "0.5em";
+
+	//the pitch
+	pitchSelect.name = "pitch";
+	pitchSelect.id = "pitch";
+	pitchSelect.style.width = "100%";
+	pitchSelect.style.display = "block";
+	for (var n = 1; n <= 20; n++) {
+		pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
+	}
+	pitchSelect.selectedIndex = 9;
+	//pitchSelect.style.marginRight = "0.5em";
+
+	document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
+	settingsDiv.append(voiceSelect);
+	settingsDiv.append(speedSelect);
+	settingsDiv.append(pitchSelect);
 } catch (err) {
 	console.log(err);
 }
 
 // get a list of questions to remove the screen reader offensive material.
+var questions = document.getElementsByClassName("questionDisplay");
 for (var question = 0; question < questions.length; ++question) {
 	try {
 		/***************************************************************
@@ -93,19 +112,21 @@ for (var question = 0; question < questions.length; ++question) {
 		btn.style.marginRight = "1em";
 		btn.onclick = (function (id, msg) {
 			return function () {
+
 				if (document.getElementById(id).textContent == "Stop") { 	// if something is already playing, just cancel it.
 					window.speechSynthesis.cancel();
 				} else {
 					document.getElementById(id).textContent = "Stop"; 		// otherwise, start playing and set the button to allow stoppage
 					window.speechSynthesis.cancel();
-					questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
+					var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
 					try {
-						var voiceNumber = document.getElementById("settingsVoice").value;
-						questionUtterance.voice = speechSynthesis.getVoices()[voiceNumber];
-						questionUtterance.rate = document.getElementById("settingsSpeed").value;
-						questionUtterance.pitch = document.getElementById("settingsPitch").value;
+						if (voiceSelect.options.length > 0) {
+							questionUtterance.voice = speechSynthesis.getVoices()[voiceSelect.options[voiceSelect.selectedIndex].value];
+						}
+						questionUtterance.rate = speedSelect.options[speedSelect.selectedIndex].value;
+						questionUtterance.pitch = pitchSelect.options[pitchSelect.selectedIndex].value;
 					} catch (err) {
-						console.log(err);
+
 					}
 					window.speechSynthesis.speak(questionUtterance);
 					questionUtterance.onend = function () {					// add an event to reset the text to "Play"
@@ -123,4 +144,88 @@ for (var question = 0; question < questions.length; ++question) {
 	}
 }
 //set a blue border to let users know this extension is active.
+setUpVoices();
+restoreOptions();
+document.getElementById("voice").addEventListener("change", saveOptions);
+document.getElementById("speed").addEventListener("change", saveOptions);
+document.getElementById("pitch").addEventListener("change", saveOptions);
+window.speechSynthesis.addEventListener('voiceschanged', setUpVoices);
 document.body.style.border = "5px solid blue";
+
+/**
+ * This method saves the user's chosen properties of the voice to local storage.  Did not use sync storage since different machines and OSs may have different voices.
+ * @param {*} e The event arguments
+ */
+function saveOptions(e) {
+	try {
+		var api = chrome || browser;
+		api.storage.local.set({
+			voice: document.querySelector("#voice").value,
+			speed: document.querySelector("#speed").value,
+			pitch: document.querySelector("#pitch").value
+		});
+		e.preventDefault();
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+/**
+ * Restores voice options from local storage.
+ */
+function restoreOptions() {
+	try {
+		var api = chrome || browser;
+		api.storage.local.get(null, res => {
+			document.querySelector("#voice").value = res.voice || getFirstVoice();
+			document.querySelector("#speed").value = res.speed || 1;
+			document.querySelector("#pitch").value = res.pitch || 1;
+		});
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+/**
+ * The speechSynthesis object isn't always ready at load.  Make it an event.
+ */
+function setUpVoices() {
+	try {
+		var voiceSelect = document.querySelector("#voice");
+		if (voiceSelect.options.length == 0) {
+			if (typeof window.speechSynthesis !== 'undefined') {
+				var voices = window.speechSynthesis.getVoices();
+				for (var n = 0; n < voices.length; ++n) {
+					if (voices[n].lang.substring(0, 2) == document.documentElement.lang.substring(0, 2)) {
+						voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
+					}
+				}
+				voiceSelect.style.display = "initial";
+			} else {
+				voiceSelect.style.display = "none";
+			}
+		}
+	} catch (err) {
+		console.log(err);
+	}
+}
+
+/**
+ * Get the first voice available that matches the document language.
+ */
+function getFirstVoice() {
+	try {
+		var voiceSelect = document.querySelector("#voice");
+		if (typeof window.speechSynthesis !== 'undefined') {
+			var voices = window.speechSynthesis.getVoices();
+			for (var n = 0; n < voices.length; ++n) {
+				if (voices[n].lang.substring(0, 2) == document.documentElement.lang.substring(0, 2)) {
+					return n;
+				}
+			}
+		}
+		return 0;
+	} catch (err) {
+		console.log(err);
+	}
+}
