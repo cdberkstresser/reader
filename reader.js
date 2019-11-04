@@ -102,8 +102,6 @@ function addPlayButtons() {
 
 			// append the answer to the question so it can be read together.
 			questionText += answerText + "\n";
-			// log all questions to the console
-			console.log(questionText);
 
 			//add a button to the question to play it in a speech synthesizer.
 			var btn = document.createElement("button");
@@ -111,7 +109,6 @@ function addPlayButtons() {
 			btn.name = btn.id;
 			btn.textContent = "Play";
 			btn.type = "button";
-			btn.style.marginRight = "1em";
 			btn.onclick = (function (id, msg) {
 				return function () {
 
@@ -137,8 +134,8 @@ function addPlayButtons() {
 					}
 				}
 			})(btn.id, questionText);
-			var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
-			questionForInjectingButton.prepend(btn);
+			//var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
+			questions[question].getElementsByClassName("wysiwygtext")[0].parentNode.prepend(btn);
 
 
 		} catch (err) {
@@ -203,12 +200,70 @@ function restoreOptions() {
 			document.querySelector("#voice").value = res.voice || getFirstVoice();
 			document.querySelector("#speed").value = res.speed || 1;
 			document.querySelector("#pitch").value = res.pitch || 1;
+			if (res.experimentalMode && res.definiteArticleColor) {
+				colorDefiniteArticles(res.definiteArticleColor);
+			}
+			if (res.experimentalMode && res.indefiniteArticleColor) {
+				colorIndefiniteArticles(res.indefiniteArticleColor);
+			}
+			if (res.experimentalMode && res.dyslexify) {
+				makeDyslexicText();
+			}
 		});
 	} catch (err) {
 		console.log(err);
 	}
 }
+/**
+ * This function colors definite articles with a particular color
+ * @param {*} color The color with which to color the word.
+ */
+function colorDefiniteArticles(color) {
+	// get a list of questions to remove the screen reader offensive material.
+	var questions = document.getElementsByClassName("questionDisplay");
+	for (var question = 0; question < questions.length; ++question) {
+		try {
+			// save question for speech synthesis
+			var replaceSpan = "<span style=color:" + color + ">the</span>"
+			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\bthe\b/g,replaceSpan);
+			answers = questions[question].getElementsByClassName("multiChoice");
+			for (var n = 0; n < answers.length; ++n) {
+				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\bthe\b/g,replaceSpan);
+			}
+		} catch (err) {
+			console.log("An error has occurred\n" + err);
+		}
+	}
+}
 
+/**
+ * This function colors indefinite articles with a particular color
+ * @param {*} color The color with which to color the word.
+ */
+function colorIndefiniteArticles(color) {
+	// get a list of questions to remove the screen reader offensive material.
+	var questions = document.getElementsByClassName("questionDisplay");
+	for (var question = 0; question < questions.length; ++question) {
+		try {
+			// first a
+			var replaceSpan = "<span style=color:" + color + ">a</span>"
+			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\ba\b/g,replaceSpan);
+			answers = questions[question].getElementsByClassName("multiChoice");
+			for (var n = 0; n < answers.length; ++n) {
+				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\ba\b/g,replaceSpan);
+			}
+			// second an
+			replaceSpan = "<span style=color:" + color + ">an</span>"
+			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\ban\b/g,replaceSpan);
+			answers = questions[question].getElementsByClassName("multiChoice");
+			for (var n = 0; n < answers.length; ++n) {
+				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\ban\b/g,replaceSpan);
+			}
+		} catch (err) {
+			console.log("An error has occurred\n" + err);
+		}
+	}
+}
 /**
  * The speechSynthesis object isn't always ready at load.  Make it an event.
  */
@@ -250,5 +305,189 @@ function getFirstVoice() {
 		return 0;
 	} catch (err) {
 		console.log(err);
+	}
+}
+
+/**
+ * Tries the simulate a dyslexic perception of the text for testing out the reader.
+ */
+function makeDyslexicText() {
+	// get a list of questions to remove the screen reader offensive material.
+	var questions = document.getElementsByClassName("questionDisplay");
+	for (var question = 0; question < questions.length; ++question) {
+		try {
+			// save question for speech synthesis
+			questions[question].getElementsByClassName("wysiwygtext")[0].textContent = dyslexify(questions[question].getElementsByClassName("wysiwygtext")[0].textContent);
+			answers = questions[question].getElementsByClassName("multiChoice");
+			for (var n = 0; n < answers.length; ++n) {
+				answers[n].getElementsByClassName("multiContent")[0].textContent = dyslexify(answers[n].getElementsByClassName("multiContent")[0].textContent);
+			}
+		} catch (err) {
+			console.log("An error has occurred\n" + err);
+		}
+	}
+}
+
+/**
+ * The dyslexic algorithm.
+ * @param {*} msg The message on which to create a dyslexic simulation.
+ */
+function dyslexify(msg) {
+	/**
+	 * Randomly swap b and d
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/[bd]/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? "b" : "d");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out the word "of"
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/\bof\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " of " : " ");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out the word "if"
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/\bif\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " if " : " ");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out the word "is"
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/\bis\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " is " : " ");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out the word "a"
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/\ba\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " a " : " ");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out the word "an"
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/\ban\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " an " : " ");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out the word "the"
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/\bthe\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " the " : " ");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly drop out t
+	 */
+	tempMsg = "";
+
+	msgDB = msg.split(/t/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? "t" : "");
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	/**
+	 * Randomly swap w
+ 	*/
+	tempMsg = "";
+
+	msgDB = msg.split(/\bwho|what|where|when|why\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + appendRandomwWords();
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+	/**
+	 * Randomly swap W
+ 	*/
+	tempMsg = "";
+
+	msgDB = msg.split(/\bWho|What|Where|When|Why\b/);
+	for (var n = 0; n < msgDB.length - 1; ++n) {
+		tempMsg += msgDB[n] + appendRandomWWords();
+	}
+	tempMsg += msgDB[msgDB.length - 1];
+	msg = tempMsg;
+
+	return msg;
+}
+
+/**
+ * Support for dyslexify.  Randomly switch lower case w words.
+ */
+function appendRandomwWords() {
+	var randomNumber = Math.floor(Math.random() * 5);
+	switch (randomNumber) {
+		case 0:
+			return "who";
+		case 1:
+			return "what";
+		case 2:
+			return "where";
+		case 3:
+			return "when";
+		case 4:
+			return "why";
+	}
+}
+/**
+ * Support for dyslexify.  Randomly switch upper case w words.
+ */
+function appendRandomWWords() {
+	var randomNumber = Math.floor(Math.random() * 5);
+	switch (randomNumber) {
+		case 0:
+			return "Who";
+		case 1:
+			return "What";
+		case 2:
+			return "Where";
+		case 3:
+			return "When";
+		case 4:
+			return "Why";
 	}
 }
