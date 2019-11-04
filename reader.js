@@ -54,10 +54,10 @@ function addOptionsMenuToTopOfQuiz() {
 		speedSelect.id = "speed";
 		speedSelect.style.width = "100%";
 		speedSelect.style.display = "block";
-		for (var n = 5; n <= 15; n++) {
+		for (var n = 8; n <= 12; n++) {
 			speedSelect.options[speedSelect.options.length] = new Option("Speed: " + (n / 10) + "x", n / 10);
 		}
-		speedSelect.selectedIndex = 5;
+		speedSelect.selectedIndex = 3;
 		speedSelect.style.marginBottom = "0.5em";
 
 		//the pitch
@@ -65,11 +65,10 @@ function addOptionsMenuToTopOfQuiz() {
 		pitchSelect.id = "pitch";
 		pitchSelect.style.width = "100%";
 		pitchSelect.style.display = "block";
-		for (var n = 1; n <= 20; n++) {
+		for (var n = 8; n <= 12; n++) {
 			pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
 		}
-		pitchSelect.selectedIndex = 9;
-		//pitchSelect.style.marginRight = "0.5em";
+		pitchSelect.selectedIndex = 3;
 
 		document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
 		settingsDiv.append(voiceSelect);
@@ -109,6 +108,7 @@ function addPlayButtons() {
 			btn.name = btn.id;
 			btn.textContent = "Play";
 			btn.type = "button";
+			btn.style.marginRight = "1em";
 			btn.onclick = (function (id, msg) {
 				return function () {
 
@@ -119,13 +119,13 @@ function addPlayButtons() {
 						window.speechSynthesis.cancel();
 						var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
 						try {
-							if (voiceSelect.options.length > 0) {
-								questionUtterance.voice = speechSynthesis.getVoices()[voiceSelect.options[voiceSelect.selectedIndex].value];
+							if (document.querySelector("#speed").options.length > 0) {
+								questionUtterance.voice = speechSynthesis.getVoices()[document.querySelector("#voice").value];
 							}
-							questionUtterance.rate = speedSelect.options[speedSelect.selectedIndex].value;
-							questionUtterance.pitch = pitchSelect.options[pitchSelect.selectedIndex].value;
+							questionUtterance.rate = document.querySelector("#speed").value;
+							questionUtterance.pitch = document.querySelector("#pitch").value;
 						} catch (err) {
-
+							console.log("Error setting voice options: " + err);
 						}
 						window.speechSynthesis.speak(questionUtterance);
 						questionUtterance.onend = function () {					// add an event to reset the text to "Play"
