@@ -54,10 +54,10 @@ function addOptionsMenuToTopOfQuiz() {
 		speedSelect.id = "speed";
 		speedSelect.style.width = "100%";
 		speedSelect.style.display = "block";
-		for (var n = 5; n <= 15; n++) {
+		for (var n = 8; n <= 12; n++) {
 			speedSelect.options[speedSelect.options.length] = new Option("Speed: " + (n / 10) + "x", n / 10);
 		}
-		speedSelect.selectedIndex = 5;
+		speedSelect.selectedIndex = 3;
 		speedSelect.style.marginBottom = "0.5em";
 
 		//the pitch
@@ -65,10 +65,10 @@ function addOptionsMenuToTopOfQuiz() {
 		pitchSelect.id = "pitch";
 		pitchSelect.style.width = "100%";
 		pitchSelect.style.display = "block";
-		for (var n = 1; n <= 20; n++) {
+		for (var n = 8; n <= 12; n++) {
 			pitchSelect.options[pitchSelect.options.length] = new Option("Pitch: " + (n / 10), n / 10);
 		}
-		pitchSelect.selectedIndex = 9;
+		pitchSelect.selectedIndex = 3;
 
 		document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
 		settingsDiv.append(voiceSelect);
