@@ -20,9 +20,13 @@ document.getElementById("pitch").addEventListener("change", saveOptions);
 
 /* The voices available on the system don't appear to be synchronous.  Add them to the list of available options when they are available or change. */
 window.speechSynthesis.addEventListener('voiceschanged', setUpVoices);
-//set a blue border to let users know this extension is active.
-document.body.style.border = "5px solid blue";
 
+/**
+ * This function handles an issue in which Chrome cancels running threads after about 16 seconds.
+ */
+function restartSpeech() {
+	window.speechSynthesis.resume();
+}
 /**
  * This function adds an options menu to the top of each quiz for selecting voice, pitch, and speed.
  */
@@ -128,8 +132,10 @@ function addPlayButtons() {
 							console.log("Error setting voice options: " + err);
 						}
 						window.speechSynthesis.speak(questionUtterance);
+						var timer = window.setInterval(restartSpeech, 15000);
 						questionUtterance.onend = function () {					// add an event to reset the text to "Play"
 							document.getElementById(id).textContent = "Play";
+							clearInterval(timer);
 						}
 					}
 				}
