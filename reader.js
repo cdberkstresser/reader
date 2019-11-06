@@ -50,7 +50,7 @@ function addOptionsMenuToTopOfQuiz() {
 		voiceSelect.name = "voice";
 		voiceSelect.id = "voice";
 		voiceSelect.style.width = "100%";
-		voiceSelect.style.display = "block";
+		voiceSelect.style.display = "none";
 		voiceSelect.style.marginBottom = "0.5em";
 
 		//the speeds
@@ -231,10 +231,12 @@ function setUpVoices() {
 						voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
 					}
 				}
-				voiceSelect.style.display = "initial";
-			} else {
-				voiceSelect.style.display = "none";
-			}
+				if (voices.length > 0) {
+					voiceSelect.style.display = "block";
+				} else {
+					voiceSelect.style.display = "none";
+				}
+			} 
 		}
 	} catch (err) {
 		console.log(err);
