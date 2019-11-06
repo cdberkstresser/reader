@@ -26,9 +26,9 @@ function pronunciationHint(msg) {
     msg = msg.replace(/&&/gi,"and");
     msg = msg.replace(/\s!\s/gi," not ");
     msg = msg.replace(/==/gi," double equals ");
-    msg = msg.replace(/>=/gi," greater than or euqal to ");
-    msg = msg.replace(/<=/gi," less than or euqal to ");
-    msg = msg.replace(/\!=/gi," not euqal to ");
+    msg = msg.replace(/>=/gi," greater than or equal to ");
+    msg = msg.replace(/<=/gi," less than or equal to ");
+    msg = msg.replace(/\!=/gi," not equal to ");
 	} catch (err) {
 		
 	} finally {
