@@ -22,6 +22,13 @@ function pronunciationHint(msg) {
     msg = msg.replace(/O\(n\^5\)/gi, "O of n to the fifth");
     msg = msg.replace(/O\(n\!\)/gi, "O of n factorial");
     msg = msg.replace(/O\(n\^n\)/gi, "O of n to the power of n");
+    msg = msg.replace(/\|\|/gi,"or");
+    msg = msg.replace(/&&/gi,"and");
+    msg = msg.replace(/\s!\s/gi," not ");
+    msg = msg.replace(/==/gi," double equals ");
+    msg = msg.replace(/>=/gi," greater than or euqal to ");
+    msg = msg.replace(/<=/gi," less than or euqal to ");
+    msg = msg.replace(/\!=/gi," not euqal to ");
 	} catch (err) {
 		
 	} finally {
