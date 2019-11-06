@@ -99,7 +99,12 @@ function addPlayButtons() {
 			for (var n = 0; n < answers.length; ++n) {
 				answerText += "\n" + (n + 1) + " " + answers[n].getElementsByClassName("multiContent")[0].textContent.trim();
 			}
-
+			//consider true or false questions, which are layed out differently.
+			if (answers.length == 0 && questions[question].innerHTML.match("questionResponses.trueFalse")) {
+				questionText = "True or false. " + questionText;
+				//answerText += "\n1 True";
+				//answerText += "\n2 False";
+			}
 			// replace _____ in questions with "[blank]" instead.
 			questionText = questionText.replace(/[_]{2,}/g, "[blank]");
 
