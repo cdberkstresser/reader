@@ -190,7 +190,7 @@ function removeExtraneousPageData() {
 function saveOptions(e) {
 	try {
 		var api = chrome || browser;
-		api.storage.local.set({
+		api.storage.sync.set({
 			voice: document.querySelector("#voice").value,
 			speed: document.querySelector("#speed").value,
 			pitch: document.querySelector("#pitch").value
@@ -207,7 +207,7 @@ function saveOptions(e) {
 function restoreOptions() {
 	try {
 		var api = chrome || browser;
-		api.storage.local.get(null, res => {
+		api.storage.sync.get(null, res => {
 			document.querySelector("#voice").value = res.voice || getFirstVoice();
 			document.querySelector("#speed").value = res.speed || 1;
 			document.querySelector("#pitch").value = res.pitch || 1;
