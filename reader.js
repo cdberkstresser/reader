@@ -20,9 +20,13 @@ document.getElementById("pitch").addEventListener("change", saveOptions);
 
 /* The voices available on the system don't appear to be synchronous.  Add them to the list of available options when they are available or change. */
 window.speechSynthesis.addEventListener('voiceschanged', setUpVoices);
-//set a blue border to let users know this extension is active.
-document.body.style.border = "5px solid blue";
 
+/**
+ * This function handles an issue in which Chrome cancels running threads after about 16 seconds.
+ */
+function restartSpeech() {
+	window.speechSynthesis.resume();
+}
 /**
  * This function adds an options menu to the top of each quiz for selecting voice, pitch, and speed.
  */
@@ -46,7 +50,7 @@ function addOptionsMenuToTopOfQuiz() {
 		voiceSelect.name = "voice";
 		voiceSelect.id = "voice";
 		voiceSelect.style.width = "100%";
-		voiceSelect.style.display = "block";
+		voiceSelect.style.display = "none";
 		voiceSelect.style.marginBottom = "0.5em";
 
 		//the speeds
@@ -95,7 +99,12 @@ function addPlayButtons() {
 			for (var n = 0; n < answers.length; ++n) {
 				answerText += "\n" + (n + 1) + " " + answers[n].getElementsByClassName("multiContent")[0].textContent.trim();
 			}
-
+			//consider true or false questions, which are layed out differently.
+			if (answers.length == 0 && questions[question].innerHTML.match("questionResponses.trueFalse")) {
+				questionText = "True or false. " + questionText;
+				//answerText += "\n1 True";
+				//answerText += "\n2 False";
+			}
 			// replace _____ in questions with "[blank]" instead.
 			questionText = questionText.replace(/[_]{2,}/g, "[blank]");
 
@@ -128,8 +137,10 @@ function addPlayButtons() {
 							console.log("Error setting voice options: " + err);
 						}
 						window.speechSynthesis.speak(questionUtterance);
+						var timer = window.setInterval(restartSpeech, 15000);
 						questionUtterance.onend = function () {					// add an event to reset the text to "Play"
 							document.getElementById(id).textContent = "Play";
+							clearInterval(timer);
 						}
 					}
 				}
@@ -173,13 +184,14 @@ function removeExtraneousPageData() {
 }
 
 /**
- * This method saves the user's chosen properties of the voice to local storage.  Did not use sync storage since different machines and OSs may have different voices.
+ * This method saves the user's chosen properties of the voice to sync storage.
+ * 2019-11-11 Adelaide V. - Changed local storage to sync storage
  * @param {*} e The event arguments
  */
 function saveOptions(e) {
 	try {
 		var api = chrome || browser;
-		api.storage.local.set({
+		api.storage.sync.set({
 			voice: document.querySelector("#voice").value,
 			speed: document.querySelector("#speed").value,
 			pitch: document.querySelector("#pitch").value
@@ -191,23 +203,24 @@ function saveOptions(e) {
 }
 
 /**
- * Restores voice options from local storage.
+ * Restores voice options from sync storage.
+ * 2019-11-11 Adelaide V. - Changed local storage to sync storage
  */
 function restoreOptions() {
 	try {
 		var api = chrome || browser;
-		api.storage.local.get(null, res => {
+		api.storage.sync.get(null, res => {
 			document.querySelector("#voice").value = res.voice || getFirstVoice();
 			document.querySelector("#speed").value = res.speed || 1;
 			document.querySelector("#pitch").value = res.pitch || 1;
-			if (res.experimentalMode && res.definiteArticleColor) {
+			if (res.experimentalMode && res.definiteArticleCheck && res.definiteArticleColor) {
 				colorDefiniteArticles(res.definiteArticleColor);
 			}
-			if (res.experimentalMode && res.indefiniteArticleColor) {
+			if (res.experimentalMode && res.indefiniteArticleCheck && res.indefiniteArticleColor) {
 				colorIndefiniteArticles(res.indefiniteArticleColor);
 			}
-			if (res.experimentalMode && res.dyslexify) {
-				makeDyslexicText();
+			if (res.experimentalMode && res.eclipseMode) {
+				eclipseMode();
 			}
 		});
 	} catch (err) {
@@ -225,10 +238,10 @@ function colorDefiniteArticles(color) {
 		try {
 			// save question for speech synthesis
 			var replaceSpan = "<span style=color:" + color + ">the</span>"
-			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\bthe\b/g,replaceSpan);
+			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\bthe\b/g, replaceSpan);
 			answers = questions[question].getElementsByClassName("multiChoice");
 			for (var n = 0; n < answers.length; ++n) {
-				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\bthe\b/g,replaceSpan);
+				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\bthe\b/g, replaceSpan);
 			}
 		} catch (err) {
 			console.log("An error has occurred\n" + err);
@@ -247,23 +260,48 @@ function colorIndefiniteArticles(color) {
 		try {
 			// first a
 			var replaceSpan = "<span style=color:" + color + ">a</span>"
-			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\ba\b/g,replaceSpan);
+			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\ba\b/g, replaceSpan);
 			answers = questions[question].getElementsByClassName("multiChoice");
 			for (var n = 0; n < answers.length; ++n) {
-				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\ba\b/g,replaceSpan);
+				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\ba\b/g, replaceSpan);
 			}
 			// second an
 			replaceSpan = "<span style=color:" + color + ">an</span>"
-			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\ban\b/g,replaceSpan);
+			questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(/\ban\b/g, replaceSpan);
 			answers = questions[question].getElementsByClassName("multiChoice");
 			for (var n = 0; n < answers.length; ++n) {
-				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\ban\b/g,replaceSpan);
+				answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(/\ban\b/g, replaceSpan);
 			}
 		} catch (err) {
 			console.log("An error has occurred\n" + err);
 		}
 	}
 }
+/**
+ * This function colors words like the eclipse ide
+ */
+function eclipseMode() {
+	// get a list of questions to remove the screen reader offensive material.
+	var questions = document.getElementsByClassName("questionDisplay");
+	for (var question = 0; question < questions.length; ++question) {
+		try {
+			var keywords = ["public", "static", "void", "throws", "int", "if", "double", "true", "false", "boolean", "long", "float", "for", "do", "while", "byte", "try", "catch", "finally", "throw", "switch", "case", "default", "else"];
+			for (var keywordId = 0; keywordId < keywords.length; ++keywordId) {
+				var replaceSpan = "<span style=color:#7f0055;font-weight:bold;>" + keywords[keywordId] + "</span>"
+				var regexToReplace = new RegExp("\\b" + keywords[keywordId] + "\\b", "g");
+				questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML = questions[question].getElementsByClassName("wysiwygtext")[0].innerHTML.replace(regexToReplace, replaceSpan);
+				answers = questions[question].getElementsByClassName("multiChoice");
+				for (var n = 0; n < answers.length; ++n) {
+					answers[n].getElementsByClassName("multiContent")[0].innerHTML = answers[n].getElementsByClassName("multiContent")[0].innerHTML.replace(regexToReplace, replaceSpan);
+				}
+			}
+		} catch (err) {
+			console.log("An error has occurred\n" + err);
+		}
+	}
+}
+
+
 /**
  * The speechSynthesis object isn't always ready at load.  Make it an event.
  */
@@ -278,9 +316,11 @@ function setUpVoices() {
 						voiceSelect.options[voiceSelect.options.length] = new Option("Voice: " + voices[n].name, n);
 					}
 				}
-				voiceSelect.style.display = "initial";
-			} else {
-				voiceSelect.style.display = "none";
+				if (voices.length > 0) {
+					voiceSelect.style.display = "block";
+				} else {
+					voiceSelect.style.display = "none";
+				}
 			}
 		}
 	} catch (err) {
@@ -305,189 +345,5 @@ function getFirstVoice() {
 		return 0;
 	} catch (err) {
 		console.log(err);
-	}
-}
-
-/**
- * Tries the simulate a dyslexic perception of the text for testing out the reader.
- */
-function makeDyslexicText() {
-	// get a list of questions to remove the screen reader offensive material.
-	var questions = document.getElementsByClassName("questionDisplay");
-	for (var question = 0; question < questions.length; ++question) {
-		try {
-			// save question for speech synthesis
-			questions[question].getElementsByClassName("wysiwygtext")[0].textContent = dyslexify(questions[question].getElementsByClassName("wysiwygtext")[0].textContent);
-			answers = questions[question].getElementsByClassName("multiChoice");
-			for (var n = 0; n < answers.length; ++n) {
-				answers[n].getElementsByClassName("multiContent")[0].textContent = dyslexify(answers[n].getElementsByClassName("multiContent")[0].textContent);
-			}
-		} catch (err) {
-			console.log("An error has occurred\n" + err);
-		}
-	}
-}
-
-/**
- * The dyslexic algorithm.
- * @param {*} msg The message on which to create a dyslexic simulation.
- */
-function dyslexify(msg) {
-	/**
-	 * Randomly swap b and d
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/[bd]/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? "b" : "d");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out the word "of"
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/\bof\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " of " : " ");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out the word "if"
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/\bif\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " if " : " ");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out the word "is"
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/\bis\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " is " : " ");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out the word "a"
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/\ba\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " a " : " ");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out the word "an"
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/\ban\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " an " : " ");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out the word "the"
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/\bthe\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? " the " : " ");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly drop out t
-	 */
-	tempMsg = "";
-
-	msgDB = msg.split(/t/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + (Math.floor(Math.random() * 2) == 0 ? "t" : "");
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	/**
-	 * Randomly swap w
- 	*/
-	tempMsg = "";
-
-	msgDB = msg.split(/\bwho|what|where|when|why\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + appendRandomwWords();
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-	/**
-	 * Randomly swap W
- 	*/
-	tempMsg = "";
-
-	msgDB = msg.split(/\bWho|What|Where|When|Why\b/);
-	for (var n = 0; n < msgDB.length - 1; ++n) {
-		tempMsg += msgDB[n] + appendRandomWWords();
-	}
-	tempMsg += msgDB[msgDB.length - 1];
-	msg = tempMsg;
-
-	return msg;
-}
-
-/**
- * Support for dyslexify.  Randomly switch lower case w words.
- */
-function appendRandomwWords() {
-	var randomNumber = Math.floor(Math.random() * 5);
-	switch (randomNumber) {
-		case 0:
-			return "who";
-		case 1:
-			return "what";
-		case 2:
-			return "where";
-		case 3:
-			return "when";
-		case 4:
-			return "why";
-	}
-}
-/**
- * Support for dyslexify.  Randomly switch upper case w words.
- */
-function appendRandomWWords() {
-	var randomNumber = Math.floor(Math.random() * 5);
-	switch (randomNumber) {
-		case 0:
-			return "Who";
-		case 1:
-			return "What";
-		case 2:
-			return "Where";
-		case 3:
-			return "When";
-		case 4:
-			return "Why";
 	}
 }

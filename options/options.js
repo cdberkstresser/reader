@@ -1,28 +1,32 @@
 /**
- * This method saves the user's chosen properties of the voice to local storage.  Did not use sync storage since different machines and OSs may have different voices.
+ * This method saves the user's chosen properties of the voice to sync storage.
  * @param {*} e The event arguments
  */
 function saveOptions(e) {
     var api = chrome || browser;
-    api.storage.local.set({
+    api.storage.sync.set({
         experimentalMode: document.querySelector("#experimentalMode").checked,
+        indefiniteArticleCheck: document.querySelector("#indefiniteArticleCheck").checked,
         indefiniteArticleColor: document.querySelector("#indefiniteArticleColor").value,
+        definiteArticleCheck: document.querySelector("#definiteArticleCheck").checked,
         definiteArticleColor: document.querySelector("#definiteArticleColor").value,
-        dyslexify: document.querySelector("#dyslexify").checked
+        eclipseMode: document.querySelector("#eclipseMode").checked
     });
     e.preventDefault();
 }
 /**
- * Restores voice options from local storage.
+ * Restores voice options from sync storage.
  */
 function restoreOptions() {
     try {
         var api = chrome || browser;
-        api.storage.local.get(null, res => {
+        api.storage.sync.get(null, res => {
             document.querySelector("#experimentalMode").checked = res.experimentalMode || false;
+            document.querySelector("#indefiniteArticleCheck").checked = res.indefiniteArticleCheck || false;
             document.querySelector("#indefiniteArticleColor").value = res.indefiniteArticleColor || "#575757";
+            document.querySelector("#definiteArticleCheck").checked = res.definiteArticleCheck || false;
             document.querySelector("#definiteArticleColor").value = res.definiteArticleColor || "#575757";
-            document.querySelector("#dyslexify").checked = res.dyslexify || false;
+            document.querySelector("#eclipseMode").checked = res.eclipseMode || false;
             enableOptions();
         });
     } catch (err) {
