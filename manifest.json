@@ -12,6 +12,11 @@
     "96": "icons/reader-96.png",
     "128": "icons/reader-128.png"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "cdberkstresser@protonmail.com"
+    }
+  }, 
   "permissions": [
     "storage"
   ],
