@@ -2,7 +2,7 @@
   "description": "Adds a reader to work with campusweb",
   "manifest_version": 2,
   "name": "CampusWeb Reader",
-  "version": "1.3.1",
+  "version": "1.4",
   "homepage_url": "https://github.com/cdberkstresser/reader",
   "icons": {
     "16": "icons/reader-16.png",
@@ -12,12 +12,9 @@
     "96": "icons/reader-96.png",
     "128": "icons/reader-128.png"
   },
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "cdberkstresser@protonmail.com"
-    }
-  },  
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [
     {
       "matches": [
