@@ -16,6 +16,7 @@ restoreOptions();
 document.getElementById("voice").addEventListener("change", saveOptions);
 document.getElementById("speed").addEventListener("change", saveOptions);
 document.getElementById("pitch").addEventListener("change", saveOptions);
+document.getElementById("colorBackground").addEventListener("change", saveOptions);
 
 /* The voices available on the system don't appear to be synchronous.  Add them to the list of available options when they are available or change. */
 window.speechSynthesis.addEventListener("voiceschanged", setUpVoices);
@@ -35,8 +36,8 @@ function addOptionsMenuToTopOfQuiz() {
     var voiceSelect = document.createElement("select");
     var speedSelect = document.createElement("select");
     var pitchSelect = document.createElement("select");
-    var colorSelect = document.createElement("select");
-    //	var style = document.createElement("select");
+	var colorBackgroundSelect = document.createElement("select");
+	
     //first the container div
     settingsDiv.id = "divReaderSettings";
     settingsDiv.textContent = "Reader Settings:\n";
@@ -58,7 +59,7 @@ function addOptionsMenuToTopOfQuiz() {
     speedSelect.name = "speed";
     speedSelect.id = "speed";
     speedSelect.style.width = "100%";
-    speedSelect.style.display = "none";
+    speedSelect.style.display = "block";
 
     for (var n = 5; n <= 15; n++) {
       speedSelect.options[speedSelect.options.length] = new Option(
@@ -66,7 +67,7 @@ function addOptionsMenuToTopOfQuiz() {
         n / 10
       );
     }
-    speedSelect.selectedIndex = 3;
+    speedSelect.selectedIndex = 4;
     speedSelect.style.marginBottom = "0.5em";
 
     //the pitch
@@ -80,27 +81,28 @@ function addOptionsMenuToTopOfQuiz() {
         n / 10
       );
     }
-    pitchSelect.selectedIndex = 3;
+    pitchSelect.selectedIndex = 4;
     pitchSelect.style.marginBottom = "0.5em";
 
-    //the color
-    speedSelect.name = "speed";
-    speedSelect.id = "speed";
-    speedSelect.style.width = "100%";
-    speedSelect.style.display = "block";
+    //the colorBackground
+    colorBackgroundSelect.name = "colorBackground";
+    colorBackgroundSelect.id = "colorBackground";
+    colorBackgroundSelect.style.width = "100%";
+    colorBackgroundSelect.style.display = "block";
     for (var n = 8; n <= 12; n++) {
-      colorSelect.options[colorSelect.options.length] = new Option(
-        "Color: " + n / 10,
+		colorBackgroundSelect.options[colorBackgroundSelect.options.length] = new Option(
+        "Theme: " + n / 10,
         n / 10
       );
     }
-    colorSelect.selectedIndex = 3;
+	colorBackgroundSelect.selectedIndex = 4;
+	//colorBackgroundSelect.style.marginBottom = "0.5em";
 
     document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
     settingsDiv.append(voiceSelect);
     settingsDiv.append(speedSelect);
     settingsDiv.append(pitchSelect);
-    settingsDiv.append(colorSelect);
+    settingsDiv.append(colorBackgroundSelect);
   } catch (err) {
     console.log(err);
   }
@@ -194,49 +196,6 @@ function addPlayButtons() {
   }
 }
 
-// //add a button to the question to play it in a speech synthesizer.
-// var btn = document.createElement("button");
-// btn.id = "btnPlayQuestion_" + question;
-// btn.name = btn.id;
-// btn.textContent = "Play question only";
-// btn.type = "button";
-// btn.style.marginRight = "1em";
-// btn.onclick = (function (id, msg) {
-// 	return function () {
-
-// 		if (document.getElementById(id).textContent == "Stop") { 	// if something is already playing, just cancel it.
-// 			window.speechSynthesis.cancel();
-// 		} else {
-// 			document.getElementById(id).textContent = "Stop"; 		// otherwise, start playing and set the button to allow stoppage
-// 			window.speechSynthesis.cancel();
-// 			var questionUtterance = new SpeechSynthesisUtterance(pronunciationHint(msg));
-// 			try {
-// 				if (document.querySelector("#speed").options.length > 0) {
-// 					questionUtterance.voice = speechSynthesis.getVoices()[document.querySelector("#voice").value];
-// 				}
-// 				questionUtterance.rate = document.querySelector("#speed").value;
-// 				questionUtterance.pitch = document.querySelector("#pitch").value;
-// 			} catch (err) {
-// 				console.log("Error setting voice options: " + err);
-// 			}
-// 			window.speechSynthesis.speak(questionUtterance);
-// 			var timer = window.setInterval(restartSpeech, 15000);
-// 			questionUtterance.onend = function () {					// add an event to reset the text to "Play"
-// 				document.getElementById(id).textContent = "Play";
-// 				clearInterval(timer);
-// 			}
-// 		}
-// 	}
-// })(btn.id, questionText);
-// //var questionForInjectingButton = questions[question].getElementsByClassName("wysiwygtext")[0];
-// questions[question].getElementsByClassName("wysiwygtext")[0].parentNode.prepend(btn);
-
-// } catch (err) {
-// 	expected.log("An error has occurred\n" + err);
-// }
-// }
-// }
-
 /**
  * This function removes extraneous data from the page that makes copy/paste difficult.
  */
@@ -285,7 +244,8 @@ function saveOptions(e) {
     api.storage.sync.set({
       voice: document.querySelector("#voice").value,
       speed: document.querySelector("#speed").value,
-      pitch: document.querySelector("#pitch").value,
+	  pitch: document.querySelector("#pitch").value,
+	  colorBackgroundSelect: document.querySelector("#colorBackgroundSelect").value,
     });
     e.preventDefault();
   } catch (err) {
@@ -303,7 +263,8 @@ function restoreOptions() {
     api.storage.sync.get(null, (res) => {
       document.querySelector("#voice").value = res.voice || getFirstVoice();
       document.querySelector("#speed").value = res.speed || 1;
-      document.querySelector("#pitch").value = res.pitch || 1;
+	  document.querySelector("#pitch").value = res.pitch || 1;
+	  document.querySelector("#colorBackgroundSelect").value = res.colorBackgroundSelect || 1;
       if (
         res.experimentalMode &&
         res.definiteArticleCheck &&
