@@ -2,6 +2,7 @@
  * This file will clean up CampusWeb's presentation of material for usage of screen readers.
  */
 
+//import { Theme } from 'react-native-windows'
 /* Add an options menu to the top of the quiz for selecting voice, pitch, and speed. */
 addOptionsMenuToTopOfQuiz();
 /* Add a play button to each question. */
@@ -12,11 +13,13 @@ removeExtraneousPageData();
 setUpVoices();
 /* Restore available voices, pitches, and speeds settings from storage if available. */
 restoreOptions();
+
 /* Add event listeners to changes on the voice, pitch, and speed settings. */
 document.getElementById("voice").addEventListener("change", saveOptions);
 document.getElementById("speed").addEventListener("change", saveOptions);
 document.getElementById("pitch").addEventListener("change", saveOptions);
 document.getElementById("colorBackground").addEventListener("change", saveOptions);
+document.getElementById("colorBackground").addEventListener("change", saveColor);
 
 /* The voices available on the system don't appear to be synchronous.  Add them to the list of available options when they are available or change. */
 window.speechSynthesis.addEventListener("voiceschanged", setUpVoices);
@@ -88,13 +91,19 @@ function addOptionsMenuToTopOfQuiz() {
     colorBackgroundSelect.name = "colorBackground";
     colorBackgroundSelect.id = "colorBackground";
     colorBackgroundSelect.style.width = "100%";
-    colorBackgroundSelect.style.display = "block";
-    for (var n = 8; n <= 12; n++) {
-		colorBackgroundSelect.options[colorBackgroundSelect.options.length] = new Option(
-        "Theme: " + n / 10,
-        n / 10
-      );
-    }
+	colorBackgroundSelect.style.display = "block";
+   // colorBackgroundSelect.label.display = "Themes";
+    colorBackgroundSelect.options[colorBackgroundSelect.options.length ] = new Option(
+		
+		"Dark blue: ", "dark"  
+	)
+	
+	colorBackgroundSelect.options[colorBackgroundSelect.options.length ] = new Option(
+		"Light: ", "light"  
+	)
+	
+
+
 	colorBackgroundSelect.selectedIndex = 4;
 	//colorBackgroundSelect.style.marginBottom = "0.5em";
 
@@ -107,6 +116,7 @@ function addOptionsMenuToTopOfQuiz() {
     console.log(err);
   }
 }
+
 
 /**
  * This function adds play buttons to each question on the quiz to read the question aloud.
@@ -245,12 +255,20 @@ function saveOptions(e) {
       voice: document.querySelector("#voice").value,
       speed: document.querySelector("#speed").value,
 	  pitch: document.querySelector("#pitch").value,
-	  colorBackgroundSelect: document.querySelector("#colorBackgroundSelect").value,
+	  colorBackgroundSelect: document.querySelector("#colorBackground").value,
     });
     e.preventDefault();
   } catch (err) {
     console.log(err);
   }
+}
+
+function saveColor(e) {
+if (document.querySelector("#colorBackground").value == "dark") {
+	document.getElementById("siteWrapper").style.backgroundColor = "#0c1520";
+} else {
+	document.getElementById("siteWrapper").style.backgroundColor = "#f4f7fb";
+}
 }
 
 /**
