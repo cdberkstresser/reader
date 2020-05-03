@@ -14,24 +14,7 @@ setUpVoices();
 /* Restore available voices, pitches, and speeds settings from storage if available. */
 restoreOptions();
 
-saveColor();
 
-colorDefiniteArticles();
-
-saveOptions();
-
-var cssId = 'myCss';  // you could encode the css path itself to generate id..
-if (!document.getElementById(cssId))
-{
-    var head  = document.getElementsByTagName('head')[0];
-    var link  = document.createElement('link');
-    link.id   = cssId;
-    link.rel  = 'stylesheet';
-    link.type = 'text/css';
-    //link.href = 'http://website.com/css/stylesheet.css';
-    link.media = 'all';
-    head.appendChild(link);
-}
 
 /* Add event listeners to changes on the voice, pitch, and speed settings. */
 document.getElementById("voice").addEventListener("change", saveOptions);
@@ -42,7 +25,7 @@ document
   .addEventListener("change", saveOptions);
 document
   .getElementById("colorBackground")
-  .addEventListener("change", saveColor);
+  .addEventListener("change", restoreColor);
 
 /* The voices available on the system don't appear to be synchronous.  Add them to the list of available options when they are available or change. */
 window.speechSynthesis.addEventListener("voiceschanged", setUpVoices);
@@ -76,10 +59,10 @@ function addOptionsMenuToTopOfQuiz() {
 
     //the voices
     voiceSelect.name = "voice";
-	voiceSelect.id = "voice";
+    voiceSelect.id = "voice";
     voiceSelect.style.width = "100%";
     voiceSelect.style.display = "block";
-	voiceSelect.style.padding = "0.5em";
+    voiceSelect.style.padding = "0.5em";
     voiceSelect.style.marginBottom = "0.5em";
 
     //the speeds
@@ -87,7 +70,7 @@ function addOptionsMenuToTopOfQuiz() {
     speedSelect.id = "speed";
     speedSelect.style.width = "100%";
     speedSelect.style.display = "block";
-	speedSelect.style.padding = "0.5em";
+    speedSelect.style.padding = "0.5em";
     for (var n = 5; n <= 15; n++) {
       speedSelect.options[speedSelect.options.length] = new Option(
         "Speed: " + n / 10 + "x",
@@ -102,7 +85,7 @@ function addOptionsMenuToTopOfQuiz() {
     pitchSelect.id = "pitch";
     pitchSelect.style.width = "100%";
     pitchSelect.style.display = "block";
-	pitchSelect.style.padding = "0.5em";
+    pitchSelect.style.padding = "0.5em";
     for (var n = 5; n <= 15; n++) {
       pitchSelect.options[pitchSelect.options.length] = new Option(
         "Pitch: " + n / 10,
@@ -115,17 +98,23 @@ function addOptionsMenuToTopOfQuiz() {
     //the colorBackground
     colorBackgroundSelect.name = "colorBackground";
     colorBackgroundSelect.id = "colorBackground";
-	colorBackgroundSelect.style.width = "100%";
+    colorBackgroundSelect.style.width = "100%";
     colorBackgroundSelect.style.display = "block";
-	colorBackgroundSelect.style.padding = "0.5em";
-	colorBackgroundSelect.textContent = "Themes";
+    colorBackgroundSelect.style.padding = "0.5em";
+    colorBackgroundSelect.textContent = "Themes";
     colorBackgroundSelect.options[
       colorBackgroundSelect.options.length
     ] = new Option("Dark blue: ", "dark");
 
     colorBackgroundSelect.options[
       colorBackgroundSelect.options.length
-    ] = new Option("Light blue: ", "light");
+	] = new Option("Light blue: ", "light");
+	
+	colorBackgroundSelect.options[
+		colorBackgroundSelect.options.length
+	  ] = new Option("Regular: ", "regular");
+
+	
 
     colorBackgroundSelect.selectedIndex = 4;
     //colorBackgroundSelect.style.marginBottom = "0.5em";
@@ -182,8 +171,8 @@ function addPlayButtons() {
       //add a button to the question to play it in a speech synthesizer.
       var btn = document.createElement("button");
       btn.id = "btnPlay_" + question;
-	  btn.name = btn.id;
-	  btn.className = "btnPlay_";
+      btn.name = btn.id;
+      btn.className = "btnPlay";
       btn.textContent = "Play";
       btn.type = "button";
       btn.style.marginRight = "1em";
@@ -286,46 +275,91 @@ function saveOptions(e) {
   }
 }
 
-function saveColor(e) {
+
+function restoreColor(e) {
   try {
     if (document.querySelector("#colorBackground").value == "dark") {
-	
+		console.log("dark");
       document.getElementById("siteWrapper").style.backgroundColor = "#0c1520";
-	  document.getElementById("lightbox").style.display = "#0c1520";
+      document.getElementById("lightbox").style.display = "#0c1520";
 	  document.getElementById("overlay").style.display = "#0c1520";
+	  document.getElementById("divReaderSettings").style.backgroundColor = "#0c1520";
+	  
+	var btnPlays = document.getElementsByClassName('btnPlay');
+	for (var i = 0;i<btnPlays.length;++i) {
+		btnPlays[i].style.color = '#0c1520';
+	}
+
+	var questionDivs = document.getElementsByClassName('questionArea');
+	for (var i = 0;i<questionDivs.length;++i) {
+		questionDivs[i].style.color = '#FFFFFF';
+	}
+
+	var sectionName = document.getElementsByClassName('groupName');
+	for (var i = 0;i<sectionName.length;++i) {
+		sectionName[i].style.color = '#FFFFFF';
+	}
 
 	  document.getElementById("voice").style.backgroundColor = "#0c1520";
-	  document.getElementById("speed").style.backgroundColor = "#0c1520";
-	  document.getElementById("pitch").style.backgroundColor = "#0c1520";
-	  document.getElementById("colorBackground").style.backgroundColor = "#0c1520";
+      document.getElementById("speed").style.backgroundColor = "#0c1520";
+      document.getElementById("pitch").style.backgroundColor = "#0c1520";
+      document.getElementById("colorBackground").style.backgroundColor = "#0c1520";
 
+	} 
+	 if (document.querySelector("#colorBackground").value == "light") {
+      document.getElementById("siteWrapper").style.backgroundColor = "#90afd6";
+      document.getElementById("lightbox").style.display = "#90afd6";
+      document.getElementById("overlay").style.display = "#90afd6";
+	  document.getElementById("divReaderSettings").style.backgroundColor = "#90afd6";
 	  
+	  var btnPlays = document.getElementsByClassName('btnPlay');
+	  for (var i = 0;i<btnPlays.length;++i) {
+		  btnPlays[i].style.color = '#0c1520';
+	  }
+  
+	  var questionDivs = document.getElementsByClassName('questionArea');
+	  for (var i = 0;i<questionDivs.length;++i) {
+		  questionDivs[i].style.color = '#0c1520';
+	  }
+  
+	  var sectionName = document.getElementsByClassName('groupName');
+	  for (var i = 0;i<sectionName.length;++i) {
+		  sectionName[i].style.color = '#0c1520';
+	  }
 
-
-	  //display: block; width: 100%; margin-bottom: 0.5em;
-    } else if (document.querySelector("#colorBackground").value == "light") {
-	  document.getElementById("siteWrapper").style.backgroundColor = "#90afd6";
-	  document.getElementById("lightbox").style.display = "#90afd6";
-	  document.getElementById("overlay").style.display = "#90afd6";
-
-	  document.getElementById("voice").style.backgroundColor = "#90afd6";
-	  document.getElementById("speed").style.backgroundColor = "#90afd6";
-	  document.getElementById("pitch").style.backgroundColor = "#90afd6";
-	  document.getElementById("colorBackground").style.backgroundColor = "#90afd6";
-
-	  document.getElementById("btn");
-	  
-
-    } else {
-	 
-      document.getElementById("siteWrapper").style.backgroundColor = "#0c15f4f7fb20";
-	  document.getElementById("lightbox").style.display = "#f4f7fb";
+      document.getElementById("voice").style.backgroundColor = "#90afd6";
+      document.getElementById("speed").style.backgroundColor = "#90afd6";
+      document.getElementById("pitch").style.backgroundColor = "#90afd6";
+      document.getElementById("colorBackground").style.backgroundColor =
+        "#90afd6";
+	} 
+	if (document.querySelector("#colorBackground").value == "regular") {
+		//console.log("Hi")
+      document.getElementById("siteWrapper").style.backgroundColor = "#f4f7fb";
+      document.getElementById("lightbox").style.display = "#f4f7fb";
 	  document.getElementById("overlay").style.display = "#f4f7fb";
+	  document.getElementById("divReaderSettings").style.backgroundColor = "#f4f7fb";
+	  
+	  var btnPlays = document.getElementsByClassName('btnPlay');
+	  for (var i = 0;i<btnPlays.length;++i) {
+		  btnPlays[i].style.color = 'black';
+	  }
+  
+	  var questionDivs = document.getElementsByClassName('questionArea');
+	  for (var i = 0;i<questionDivs.length;++i) {
+		  questionDivs[i].style.color = 'black';
+	  }
+  
+	  var sectionName = document.getElementsByClassName('groupName');
+	  for (var i = 0;i<sectionName.length;++i) {
+		  sectionName[i].style.color = 'black';
+	  }
 
-	  document.getElementById("voice").style.backgroundColor = "#f4f7fb";
-	  document.getElementById("speed").style.backgroundColor = "#f4f7fb";
-	  document.getElementById("pitch").style.backgroundColor = "#f4f7fb";
-	  document.getElementById("colorBackground").style.backgroundColor = "#f4f7fb";
+      document.getElementById("voice").style.backgroundColor = "#f4f7fb";
+      document.getElementById("speed").style.backgroundColor = "#f4f7fb";
+      document.getElementById("pitch").style.backgroundColor = "#f4f7fb";
+      document.getElementById("colorBackground").style.backgroundColor =
+        "#f4f7fb";
     }
   } catch (err) {
     console.log(err);
@@ -343,8 +377,9 @@ function restoreOptions() {
       document.querySelector("#voice").value = res.voice || getFirstVoice();
       document.querySelector("#speed").value = res.speed || 1;
       document.querySelector("#pitch").value = res.pitch || 1;
-      document.querySelector("#colorBackgroundSelect").value =
-        res.colorBackground || 1;
+      document.querySelector("#colorBackground").value =
+		res.colorBackground || "light";
+		restoreColor();
       if (
         res.experimentalMode &&
         res.definiteArticleCheck &&
