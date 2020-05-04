@@ -3,7 +3,9 @@
  */
 
 //import { Theme } from 'react-native-windows'
-/* Add an options menu to the top of the quiz for selecting voice, pitch, and speed. */
+/* Add an options menu to the top of the quiz for selecting voice, pitch, and speed. 
+ * 5-3-2020 Adelaide V. - Added themes, and font size options
+*/
 addOptionsMenuToTopOfQuiz();
 /* Add a play button to each question. */
 addPlayButtons();
@@ -11,15 +13,20 @@ addPlayButtons();
 removeExtraneousPageData();
 /* Set up voice options in the options menu at the top of the quiz for available voices, pitches, and speeds. */
 setUpVoices();
-/* Restore available voices, pitches, and speeds settings from storage if available. */
+/* Restore available voices, pitches, and speeds settings from storage if available. 
+ * 5-3-2020 Adelaide V. - Added themes, and font size options
+*/
 restoreOptions();
 
-
-
-/* Add event listeners to changes on the voice, pitch, and speed settings. */
+/* Add event listeners to changes on the voice, pitch, and speed settings.
+ * 5-3-2020 Adelaide V. - Added themes, and font size options
+*/
 document.getElementById("voice").addEventListener("change", saveOptions);
 document.getElementById("speed").addEventListener("change", saveOptions);
 document.getElementById("pitch").addEventListener("change", saveOptions);
+document.getElementById("fontSize").addEventListener("change", saveOptions);
+document.getElementById("fontSize").addEventListener("change", restoreFontSize);
+
 document
   .getElementById("colorBackground")
   .addEventListener("change", saveOptions);
@@ -38,6 +45,7 @@ function restartSpeech() {
 }
 /**
  * This function adds an options menu to the top of each quiz for selecting voice, pitch, and speed.
+ * 5-3-2020 Adelaide V. - Added themes, and font size options
  */
 function addOptionsMenuToTopOfQuiz() {
   try {
@@ -46,10 +54,11 @@ function addOptionsMenuToTopOfQuiz() {
     var speedSelect = document.createElement("select");
     var pitchSelect = document.createElement("select");
     var colorBackgroundSelect = document.createElement("select");
+    var fontSizeSelect = document.createElement("select");
 
     //first the container div
     settingsDiv.id = "divReaderSettings";
-    settingsDiv.textContent = "Reader Settings:\n";
+	settingsDiv.textContent = "Settings:\n";
     settingsDiv.setAttribute("style", "white-space: pre;");
     settingsDiv.style.marginBottom = "1em";
     settingsDiv.style.fontWeight = "bold";
@@ -77,7 +86,7 @@ function addOptionsMenuToTopOfQuiz() {
         n / 10
       );
     }
-    speedSelect.selectedIndex = 4;
+    speedSelect.selectedIndex = 5;
     speedSelect.style.marginBottom = "0.5em";
 
     //the pitch
@@ -92,10 +101,10 @@ function addOptionsMenuToTopOfQuiz() {
         n / 10
       );
     }
-    pitchSelect.selectedIndex = 4;
+    pitchSelect.selectedIndex = 5;
     pitchSelect.style.marginBottom = "0.5em";
 
-    //the colorBackground
+    //the themes
     colorBackgroundSelect.name = "colorBackground";
     colorBackgroundSelect.id = "colorBackground";
     colorBackgroundSelect.style.width = "100%";
@@ -108,22 +117,56 @@ function addOptionsMenuToTopOfQuiz() {
 
     colorBackgroundSelect.options[
       colorBackgroundSelect.options.length
-	] = new Option("Light blue: ", "light");
-	
-	colorBackgroundSelect.options[
-		colorBackgroundSelect.options.length
-	  ] = new Option("Regular: ", "regular");
+    ] = new Option("Light blue: ", "light");
 
-	
+    colorBackgroundSelect.options[
+      colorBackgroundSelect.options.length
+    ] = new Option("Regular: ", "regular");
 
-    colorBackgroundSelect.selectedIndex = 4;
-    //colorBackgroundSelect.style.marginBottom = "0.5em";
+	colorBackgroundSelect.selectedIndex = 5;
+	colorBackgroundSelect.style.marginBottom = "0.5em";
+
+    //the font size
+    fontSizeSelect.name = "fontSize";
+    fontSizeSelect.id = "fontSize";
+    fontSizeSelect.style.width = "100%";
+    fontSizeSelect.style.display = "block";
+    fontSizeSelect.style.padding = "0.5em";
+    fontSizeSelect.textContent = "Themes";
+    fontSizeSelect.options[fontSizeSelect.options.length] = new Option(
+      "X-small: ",
+      "x-small"
+    );
+
+    fontSizeSelect.options[fontSizeSelect.options.length] = new Option(
+      "Small: ",
+      "small"
+    );
+
+    fontSizeSelect.options[fontSizeSelect.options.length] = new Option(
+      "Medium: ",
+      "medium"
+	);
+	
+	fontSizeSelect.options[fontSizeSelect.options.length] = new Option(
+		"Large: ",
+		"large"
+	  );
+
+	  fontSizeSelect.options[fontSizeSelect.options.length] = new Option(
+		"X-large: ",
+		"x-large"
+	  );
+
+	fontSizeSelect.selectedIndex = 5;
+	fontSizeSelect.style.marginBottom = "0.5em";
 
     document.getElementsByClassName("questionArea")[0].prepend(settingsDiv);
     settingsDiv.append(voiceSelect);
     settingsDiv.append(speedSelect);
     settingsDiv.append(pitchSelect);
     settingsDiv.append(colorBackgroundSelect);
+    settingsDiv.append(fontSizeSelect);
   } catch (err) {
     console.log(err);
   }
@@ -256,7 +299,7 @@ function removeExtraneousPageData() {
 }
 
 /**
- * This method saves the user's chosen properties of the voice to sync storage.
+ * This method saves the user's chosen properties of the voice and themes to sync storage.
  * 2019-11-11 Adelaide V. - Changed local storage to sync storage
  * @param {*} e The event arguments
  */
@@ -268,6 +311,7 @@ function saveOptions(e) {
       speed: document.querySelector("#speed").value,
       pitch: document.querySelector("#pitch").value,
       colorBackground: document.querySelector("#colorBackground").value,
+      fontSize: document.querySelector("#fontSize").value,
     });
     e.preventDefault();
   } catch (err) {
@@ -275,100 +319,176 @@ function saveOptions(e) {
   }
 }
 
-
+/**
+ * This will allow the user to change the theme of a given quiz or test.
+ * 5-3-2020 Adelaide V.
+ * 
+ * @param {*} e The event arguments
+ */
 function restoreColor(e) {
   try {
+	  // The dark blue option
     if (document.querySelector("#colorBackground").value == "dark") {
-		console.log("dark");
       document.getElementById("siteWrapper").style.backgroundColor = "#0c1520";
       document.getElementById("lightbox").style.display = "#0c1520";
-	  document.getElementById("overlay").style.display = "#0c1520";
-	  document.getElementById("divReaderSettings").style.backgroundColor = "#0c1520";
-	  
-	var btnPlays = document.getElementsByClassName('btnPlay');
-	for (var i = 0;i<btnPlays.length;++i) {
-		btnPlays[i].style.color = '#0c1520';
-	}
+      document.getElementById("overlay").style.display = "#0c1520";
+      document.getElementById("divReaderSettings").style.backgroundColor =
+        "#0c1520";
 
-	var questionDivs = document.getElementsByClassName('questionArea');
-	for (var i = 0;i<questionDivs.length;++i) {
-		questionDivs[i].style.color = '#FFFFFF';
-	}
+      var btnPlays = document.getElementsByClassName("btnPlay");
+      for (var i = 0; i < btnPlays.length; ++i) {
+        btnPlays[i].style.color = "#0c1520";
+      }
 
-	var sectionName = document.getElementsByClassName('groupName');
-	for (var i = 0;i<sectionName.length;++i) {
-		sectionName[i].style.color = '#FFFFFF';
-	}
+      var questionDivs = document.getElementsByClassName("questionArea");
+      for (var i = 0; i < questionDivs.length; ++i) {
+        questionDivs[i].style.color = "#FFFFFF";
+      }
 
-	  document.getElementById("voice").style.backgroundColor = "#0c1520";
+      var sectionName = document.getElementsByClassName("groupName");
+      for (var i = 0; i < sectionName.length; ++i) {
+        sectionName[i].style.color = "#FFFFFF";
+      }
+
+      var headerSection = document.getElementsByClassName("testStatus");
+      for (var i = 0; i < headerSection.length; ++i) {
+        headerSection[i].style.color = "#0c1520";
+      }
+
+      document.getElementById("voice").style.backgroundColor = "#0c1520";
       document.getElementById("speed").style.backgroundColor = "#0c1520";
       document.getElementById("pitch").style.backgroundColor = "#0c1520";
       document.getElementById("colorBackground").style.backgroundColor = "#0c1520";
+	  document.getElementById("fontSize").style.backgroundColor = "#0c1520";
+	}
+	
+	// The light blue option
+    if (document.querySelector("#colorBackground").value == "light") {
+      document.getElementById("siteWrapper").style.backgroundColor = "#9fb9da";
+      document.getElementById("lightbox").style.display = "#9fb9da";
+      document.getElementById("overlay").style.display = "#9fb9da";
+      document.getElementById("divReaderSettings").style.backgroundColor =
+        "#9fb9da";
 
-	} 
-	 if (document.querySelector("#colorBackground").value == "light") {
-      document.getElementById("siteWrapper").style.backgroundColor = "#90afd6";
-      document.getElementById("lightbox").style.display = "#90afd6";
-      document.getElementById("overlay").style.display = "#90afd6";
-	  document.getElementById("divReaderSettings").style.backgroundColor = "#90afd6";
-	  
-	  var btnPlays = document.getElementsByClassName('btnPlay');
-	  for (var i = 0;i<btnPlays.length;++i) {
-		  btnPlays[i].style.color = '#0c1520';
-	  }
-  
-	  var questionDivs = document.getElementsByClassName('questionArea');
-	  for (var i = 0;i<questionDivs.length;++i) {
-		  questionDivs[i].style.color = '#0c1520';
-	  }
-  
-	  var sectionName = document.getElementsByClassName('groupName');
-	  for (var i = 0;i<sectionName.length;++i) {
-		  sectionName[i].style.color = '#0c1520';
-	  }
+      var btnPlays = document.getElementsByClassName("btnPlay");
+      for (var i = 0; i < btnPlays.length; ++i) {
+        btnPlays[i].style.color = "#0c1520";
+      }
 
-      document.getElementById("voice").style.backgroundColor = "#90afd6";
-      document.getElementById("speed").style.backgroundColor = "#90afd6";
-      document.getElementById("pitch").style.backgroundColor = "#90afd6";
+      var questionDivs = document.getElementsByClassName("questionArea");
+      for (var i = 0; i < questionDivs.length; ++i) {
+        questionDivs[i].style.color = "#0c1520";
+      }
+
+      var sectionName = document.getElementsByClassName("groupName");
+      for (var i = 0; i < sectionName.length; ++i) {
+        sectionName[i].style.color = "#0c1520";
+      }
+
+      document.getElementById("voice").style.backgroundColor = "#9fb9da";
+      document.getElementById("speed").style.backgroundColor = "#9fb9da";
+      document.getElementById("pitch").style.backgroundColor = "#9fb9da";
       document.getElementById("colorBackground").style.backgroundColor =
-        "#90afd6";
-	} 
-	if (document.querySelector("#colorBackground").value == "regular") {
-		//console.log("Hi")
+		"#9fb9da";
+		document.getElementById("fontSize").style.backgroundColor = "#9fb9da";
+	}
+	
+	// The regular option
+    if (document.querySelector("#colorBackground").value == "regular") {
+      //console.log("Hi")
       document.getElementById("siteWrapper").style.backgroundColor = "#f4f7fb";
       document.getElementById("lightbox").style.display = "#f4f7fb";
-	  document.getElementById("overlay").style.display = "#f4f7fb";
-	  document.getElementById("divReaderSettings").style.backgroundColor = "#f4f7fb";
-	  
-	  var btnPlays = document.getElementsByClassName('btnPlay');
-	  for (var i = 0;i<btnPlays.length;++i) {
-		  btnPlays[i].style.color = 'black';
-	  }
-  
-	  var questionDivs = document.getElementsByClassName('questionArea');
-	  for (var i = 0;i<questionDivs.length;++i) {
-		  questionDivs[i].style.color = 'black';
-	  }
-  
-	  var sectionName = document.getElementsByClassName('groupName');
-	  for (var i = 0;i<sectionName.length;++i) {
-		  sectionName[i].style.color = 'black';
-	  }
+      document.getElementById("overlay").style.display = "#f4f7fb";
+      document.getElementById("divReaderSettings").style.backgroundColor =
+        "#f4f7fb";
+
+      var btnPlays = document.getElementsByClassName("btnPlay");
+      for (var i = 0; i < btnPlays.length; ++i) {
+        btnPlays[i].style.color = "black";
+      }
+
+      var questionDivs = document.getElementsByClassName("questionArea");
+      for (var i = 0; i < questionDivs.length; ++i) {
+        questionDivs[i].style.color = "black";
+      }
+
+      var sectionName = document.getElementsByClassName("groupName");
+      for (var i = 0; i < sectionName.length; ++i) {
+        sectionName[i].style.color = "black";
+      }
 
       document.getElementById("voice").style.backgroundColor = "#f4f7fb";
       document.getElementById("speed").style.backgroundColor = "#f4f7fb";
       document.getElementById("pitch").style.backgroundColor = "#f4f7fb";
       document.getElementById("colorBackground").style.backgroundColor =
-        "#f4f7fb";
+		"#f4f7fb";
+		document.getElementById("fontSize").style.backgroundColor = "#f4f7fb";
     }
   } catch (err) {
     console.log(err);
   }
 }
 
+
 /**
- * Restores voice options from sync storage.
+ * This will allow the user to change the font size in a given quiz or test
+ * 5-3-2020 Adelaide V.
+ * 
+ * @param {*} e The event arguments
+ */
+function restoreFontSize(e) {
+	try {
+		if (document.querySelector("#fontSize").value == "x-large") {
+			var area = document.getElementsByClassName("questionArea");
+			  for (var i = 0; i < area.length; ++i) {
+				area[i].style.fontSize = "x-large";
+			  }
+			
+		}
+
+		if (document.querySelector("#fontSize").value == "large") {
+			var area = document.getElementsByClassName("questionArea");
+			for (var i = 0; i < area.length; ++i) {
+				area[i].style.fontSize = "large";
+			}
+			
+		}
+
+		if (document.querySelector("#fontSize").value == "medium") {
+			var area = document.getElementsByClassName("questionArea");
+			for (var i = 0; i < area.length; ++i) {
+			area[i].style.fontSize = "medium";
+			}
+
+		}
+
+		if (document.querySelector("#fontSize").value == "small") {
+			var area = document.getElementsByClassName("questionArea");
+			for (var i = 0; i < area.length; ++i) {
+			area[i].style.fontSize = "small";
+			}
+		}
+
+		if (document.querySelector("#fontSize").value == "x-small") {
+			var area = document.getElementsByClassName("questionArea");
+			for (var i = 0; i < area.length; ++i) {
+			area[i].style.fontSize = "x-small";
+			}
+		}
+
+
+
+} catch (err) {
+    console.log(err);
+  }
+}
+
+
+
+/**
+ * Restores voice and theme options from sync storage.
  * 2019-11-11 Adelaide V. - Changed local storage to sync storage
+ * 5-3-2020 Adelaide V. - Added theme options
  */
 function restoreOptions() {
   try {
@@ -378,8 +498,10 @@ function restoreOptions() {
       document.querySelector("#speed").value = res.speed || 1;
       document.querySelector("#pitch").value = res.pitch || 1;
       document.querySelector("#colorBackground").value =
-		res.colorBackground || "light";
-		restoreColor();
+        res.colorBackground || "light";
+      restoreColor();
+      document.querySelector("#fontSize").value = res.fontSize || "medium";
+	  restoreFontSize();
       if (
         res.experimentalMode &&
         res.definiteArticleCheck &&
@@ -402,6 +524,10 @@ function restoreOptions() {
     console.log(err);
   }
 }
+
+
+
+
 /**
  * This function colors definite articles with a particular color
  * @param {*} color The color with which to color the word.
